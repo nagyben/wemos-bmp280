@@ -30,7 +30,8 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: 'tf apply'
-      run: terraform apply --auto-approve
+      run: terraform apply --auto-approve -var="billing_alert_email=$BILLING_ALERT_EMAIL"
       working-directory: terraform
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        BILLING_ALERT_EMAIL: ${{ secrets.BILLING_ALERT_EMAIL }}
