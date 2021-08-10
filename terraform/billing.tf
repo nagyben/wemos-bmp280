@@ -3,10 +3,6 @@ data "google_billing_account" "account" {
   depends_on      = [google_project_service.enabled_apis]
 }
 
-data "google_project" "project" {
-  depends_on = [google_project_service.enabled_apis]
-}
-
 resource "google_billing_budget" "budget" {
   billing_account = data.google_billing_account.account.id
   display_name    = "nagyben-budget"
