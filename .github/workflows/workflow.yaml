@@ -24,10 +24,12 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: 'tf plan'
-      run: terraform plan
+      run: terraform plan -var="billing_alert_email=$BILLING_ALERT_EMAIL" -var="project=$GOOGLE_PROJECT"
       working-directory: terraform
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        BILLING_ALERT_EMAIL: ${{ secrets.BILLING_ALERT_EMAIL }}
+        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
 
     - name: 'tf apply'
       run: |
