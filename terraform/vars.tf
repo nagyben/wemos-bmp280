@@ -6,3 +6,7 @@ variable "region" {
 variable "billing_alert_email" {
     type = string
 }
+
+variable "project" {
+    type = string
+}
