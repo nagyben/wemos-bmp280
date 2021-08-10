@@ -5,7 +5,8 @@ locals {
     "pubsublite.googleapis.com",
     "cloudfunctions.googleapis.com",
     "cloudbilling.googleapis.com",
-    "cloudresourcemanager.googleapis.com"
+    "cloudresourcemanager.googleapis.com",
+    "billingbudgets.googleapis.com"
   ]
 }
 
