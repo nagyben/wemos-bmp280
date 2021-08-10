@@ -9,6 +9,6 @@ resource "google_pubsub_lite_topic" "garden_weather" {
   }
 
   retention_config {
-    per_partition_bytes = 1000000000 # 1GB
+    per_partition_bytes = 1073741824 # 1GiB
   }
 }
