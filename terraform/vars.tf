@@ -1,12 +1,12 @@
 variable "region" {
-    type = string
-    default = "europe-west2"
+  type    = string
+  default = "europe-west2"
 }
 
 variable "billing_alert_email" {
-    type = string
+  type = string
 }
 
 variable "project" {
-    type = string
+  type = string
 }

@@ -1,9 +1,10 @@
 data "google_billing_account" "account" {
   billing_account = "010695-569D68-655635"
-  depends_on = [google_project_service.enabled_apis]
+  depends_on      = [google_project_service.enabled_apis]
 }
 
 data "google_project" "project" {
+  depends_on = [google_project_service.enabled_apis]
 }
 
 resource "google_billing_budget" "budget" {

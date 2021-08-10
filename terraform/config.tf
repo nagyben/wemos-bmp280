@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket  = "nagyben-tfstate"
-    prefix  = "terraform/state"
+    bucket = "nagyben-tfstate"
+    prefix = "terraform/state"
   }
 }
