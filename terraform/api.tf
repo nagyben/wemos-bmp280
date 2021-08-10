@@ -4,7 +4,8 @@ locals {
         "cloudbuild.googleapis.com",
         "pubsublite.googleapis.com",
         "cloudfunctions.googleapis.com",
-        "cloudbilling.googleapis.com"
+        "cloudbilling.googleapis.com",
+        "cloudresourcemanager.googleapis.com"
     ]
 }
 
