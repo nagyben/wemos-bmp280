@@ -6,7 +6,8 @@ locals {
     "cloudfunctions.googleapis.com",
     "cloudbilling.googleapis.com",
     "cloudresourcemanager.googleapis.com",
-    "billingbudgets.googleapis.com"
+    "billingbudgets.googleapis.com",
+    "secretmanager.googleapis.com"
   ]
 }
 
