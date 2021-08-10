@@ -3,7 +3,8 @@ locals {
         "iam.googleapis.com",
         "cloudbuild.googleapis.com",
         "pubsublite.googleapis.com",
-        "cloudfunctions.googleapis.com"
+        "cloudfunctions.googleapis.com",
+        "cloudbilling.googleapis.com"
     ]
 }
 
