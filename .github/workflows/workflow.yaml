@@ -60,6 +60,8 @@ jobs:
 
     - name: 'tf output'
       run: |
+        sudo apt-get install jq -y
+        jq --version
         terraform output -json
         export api_url=$(terraform output -json | jq -r ".receiver_url.value")
         echo $api_url
@@ -77,7 +79,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         pip install -r requirements.txt
-        sudo apt-get install jq -y
       working-directory: cloud_functions
 
     - name: Test with pytest
