@@ -27,3 +27,12 @@ resource "google_cloudfunctions_function" "receiver_function" {
   trigger_http          = true
   entry_point           = "receiver_function"
 }
+
+resource "google_cloudfunctions_function_iam_member" "receiver_function_invoker" {
+  project        = google_cloudfunctions_function.receiver_function.project
+  region         = google_cloudfunctions_function.receiver_function.region
+  cloud_function = google_cloudfunctions_function.receiver_function.name
+
+  role   = "roles/cloudfunctions.invoker"
+  member = "allUsers"
+}
