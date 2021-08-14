@@ -59,7 +59,10 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: 'tf output'
-      run: tfoutput=$(terraform output -json)
+      run: |
+        terraform output -json
+        export api_url=$(terraform output -json | jq -r ".receiver_url.value")
+        echo $api_url
       working-directory: terraform
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
@@ -78,5 +81,5 @@ jobs:
       working-directory: cloud_functions
 
     - name: Test with pytest
-      run: RECEIVER_URL=$(echo $tfoutput | jq -r ".receiver_url.value") pytest e2e/
+      run: RECEIVER_URL=$api_url pytest e2e/
       working-directory: cloud_functions
