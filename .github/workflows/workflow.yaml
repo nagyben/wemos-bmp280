@@ -59,12 +59,7 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: 'tf output'
-      run: |
-        sudo apt-get install jq -y
-        jq --version
-        terraform output -json
-        export api_url=$(terraform output -json | jq -r ".receiver_url.value")
-        echo $api_url
+      run: terraform output -json > tfoutput.json
       working-directory: terraform
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
@@ -82,5 +77,8 @@ jobs:
       working-directory: cloud_functions
 
     - name: Test with pytest
-      run: RECEIVER_URL=$api_url pytest e2e/
+      run: |
+        export RECEIVER_URL=$(jq -r ".receiver_url.value" ../terraform/tfoutput.json)
+        echo RECEIVER_URL
+        pytest e2e/
       working-directory: cloud_functions
