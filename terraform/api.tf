@@ -2,7 +2,7 @@ locals {
   services = [
     "iam.googleapis.com",
     "cloudbuild.googleapis.com",
-    "pubsublite.googleapis.com",
+    "appengine.googleapis.com",
     "cloudfunctions.googleapis.com",
     "cloudbilling.googleapis.com",
     "cloudresourcemanager.googleapis.com",
