@@ -1,3 +1,6 @@
 .terraform
 .terraform*
 sa.json
+.venv
+.pytest_cache
+__pycache__
