@@ -59,7 +59,7 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: 'tf output'
-      run: terraform output -json > tfoutput.json
+      run: terraform-bin output -json > tfoutput.json
       working-directory: terraform
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
