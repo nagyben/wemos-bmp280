@@ -78,5 +78,5 @@ jobs:
       working-directory: cloud_functions
 
     - name: Test with pytest
-      run: RECEIVER_URL=$(echo $tfoutput | jq -r 'receiver_url') pytest e2e/
+      run: RECEIVER_URL=$(echo $tfoutput | jq -r ".receiver_url.value") pytest e2e/
       working-directory: cloud_functions
