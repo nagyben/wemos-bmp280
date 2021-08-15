@@ -78,6 +78,12 @@ jobs:
         pip install -r requirements.txt
       working-directory: cloud_functions
 
+    - run: echo $GOOGLE_CREDENTIALS > /creds.json
+      name: write creds to file
+      env:
+        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
     - name: Test with pytest
       run: |
         cat ../terraform/tfoutput.json
@@ -86,4 +92,4 @@ jobs:
       working-directory: cloud_functions
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_CREDENTIALS: /creds.json
