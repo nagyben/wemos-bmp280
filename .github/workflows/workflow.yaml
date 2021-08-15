@@ -78,7 +78,7 @@ jobs:
         pip install -r requirements.txt
       working-directory: cloud_functions
 
-    - run: echo $GOOGLE_CREDENTIALS > /creds.json
+    - run: echo $GOOGLE_CREDENTIALS > ~/creds.json
       name: write creds to file
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
@@ -92,4 +92,4 @@ jobs:
       working-directory: cloud_functions
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-        GOOGLE_CREDENTIALS: /creds.json
+        GOOGLE_CREDENTIALS: ~/creds.json
