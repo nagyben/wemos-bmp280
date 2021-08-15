@@ -86,3 +86,4 @@ jobs:
       working-directory: cloud_functions
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
