@@ -25,6 +25,6 @@ def test_receiver():
     docs = db.collection(COLLECTION).stream()
 
 
-    actual = docs.next().to_dict()
+    actual = next(docs).to_dict()
     print(actual)
     assert actual["key"] == "value"
