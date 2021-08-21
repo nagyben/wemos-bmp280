@@ -1,4 +1,5 @@
 import os
+
 import requests
 from google.cloud import firestore
 
@@ -7,11 +8,13 @@ GOOGLE_PROJECT = os.getenv("GOOGLE_PROJECT")
 
 COLLECTION = "weather"
 
+
 def delete_documents(db: firestore.Client):
     docs = db.collection(COLLECTION).stream()
 
     for doc in docs:
         doc.reference.delete()
+
 
 def test_receiver():
     db = firestore.Client(project=GOOGLE_PROJECT)
@@ -23,7 +26,6 @@ def test_receiver():
     assert response.status_code == 200
 
     docs = db.collection(COLLECTION).stream()
-
 
     actual = next(docs).to_dict()
     print(actual)

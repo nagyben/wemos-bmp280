@@ -1,3 +1,13 @@
+import logging
+import os
+import unittest.mock as mock
+
+import firebase_admin
+from firebase_admin import firestore
+
+LOG = logging.getLogger(__name__)
+
+
 def receiver(request):
     """Responds to any HTTP request.
     Args:
@@ -7,10 +17,15 @@ def receiver(request):
         Response object using
         `make_response <https://flask.palletsprojects.com/en/1.1.x/api/#flask.Flask.make_response>`.
     """
-    request_json = request.get_json()
-    if request.args and 'message' in request.args:
-        return request.args.get('message')
-    elif request_json and 'message' in request_json:
-        return request_json['message']
-    else:
-        return f'Hello World!'
+    db = _get_firestore_client()
+    # project=os.getenv("FIRESTORE_PROJECT_ID"), client_options={"api_endpoint": os.getenv("FIRESTORE_EMULATOR_HOST")}
+
+    LOG.debug("Inserting shtuff")
+    db.collection("weather").document("test").set({"key": "value"})
+
+    return f"OK"
+
+
+def _get_firestore_client():
+    LOG.info("Getting firestore client...")
+    return firestore.Client()
