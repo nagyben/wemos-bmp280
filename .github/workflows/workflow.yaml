@@ -10,6 +10,7 @@ concurrency: 'workflow'
 jobs:
   test:
     name: 'Test'
+    runs-on: ubuntu-latest
 
     steps:
     - name: 'Checkout'
