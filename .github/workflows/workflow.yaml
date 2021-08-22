@@ -12,6 +12,12 @@ jobs:
     name: 'Test'
     runs-on: ubuntu-latest
 
+    services:
+      firestore:
+        image: mtlynch/firestore-emulator
+        ports:
+        - 8080:8080
+
     steps:
     - name: 'Checkout'
       uses: actions/checkout@v2
@@ -42,6 +48,9 @@ jobs:
       run: |
         python -m pytest tests/
       working-directory: cloud_functions
+      env:
+        FIRESTORE_EMULATOR_HOST: localhost:8080
+        FIRESTORE_PROJECT_ID: dummy-firestore-id
 
   terraform:
     name: 'Terraform'
