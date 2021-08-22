@@ -15,9 +15,13 @@ data "archive_file" "data_ingestion_source" {
 
 resource "google_storage_bucket_object" "zip" {
   # Append file MD5 to force object to be recreated
-  name   = "function-${data.archive_file.data_ingestion_source.output_md5}.zip"
+  name   = "function.zip"
   bucket = google_storage_bucket.functions_storage_bucket.name
   source = data.archive_file.data_ingestion_source.output_path
+
+  keepers {
+    md5_hash = "${data.archive_file.data_ingestion_source.output_md5}"
+  }
 }
 
 # Receiver function
