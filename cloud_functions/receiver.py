@@ -2,7 +2,6 @@ import logging
 import os
 import unittest.mock as mock
 
-import firebase_admin
 from firebase_admin import firestore
 
 LOG = logging.getLogger(__name__)
@@ -18,7 +17,6 @@ def receiver(request):
         `make_response <https://flask.palletsprojects.com/en/1.1.x/api/#flask.Flask.make_response>`.
     """
     db = _get_firestore_client()
-    # project=os.getenv("FIRESTORE_PROJECT_ID"), client_options={"api_endpoint": os.getenv("FIRESTORE_EMULATOR_HOST")}
 
     LOG.debug("Inserting shtuff")
     db.collection("weather").document("test").set({"key": "value"})

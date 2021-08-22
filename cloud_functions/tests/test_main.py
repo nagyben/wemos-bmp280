@@ -33,12 +33,14 @@ def empty_db(db):
         doc.reference.delete()
 
 
+# https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/functions/helloworld/main_test.py
 def test_receiver(app, db, empty_db):
-    with app.test_request_context():
+    data = {"key": "value"}
+    with app.test_request_context(json=data):
         assert main.receiver_function(flask.request) == "OK"
 
         docs = db.collection(u"weather").stream()
 
         actual_doc = next(docs).to_dict()
         print(actual_doc)
-        assert actual_doc == {u"key": u"value"}
+        assert actual_doc == data
