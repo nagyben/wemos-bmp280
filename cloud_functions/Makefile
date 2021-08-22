@@ -1,10 +1,10 @@
 .PHONY: test
 test:
-	python -m pytest tests/
+	poetry run python -m pytest tests/
 
 .PHONY: test-s
 test-s:
-	python -m pytest tests/ -s
+	poetry run python -m pytest tests/ -s
 
 .PHONY: install
 install:
