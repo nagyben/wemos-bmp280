@@ -1,4 +1,0 @@
-requests
-pytest
-google-cloud-firestore
-firebase_admin

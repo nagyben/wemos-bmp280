@@ -19,6 +19,16 @@ jobs:
     - name: 'install tf'
       uses: hashicorp/setup-terraform@v1
 
+    - name: 'export requirements'
+      run: |
+        pip install -U pip
+        pip install poetry
+        poetry lock
+        poetry export --without-hashes > requirements.txt
+      env:
+        POETRY_VIRTUALENVS_CREATE: false
+      working-directory: cloud_functions
+
     - name: 'tf init'
       run: terraform init
       working-directory: terraform
