@@ -1,3 +1,0 @@
-flask
-pytest
-google-cloud-firestore
