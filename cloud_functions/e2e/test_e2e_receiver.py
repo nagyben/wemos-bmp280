@@ -20,7 +20,9 @@ def test_receiver():
     db = firestore.Client(project=GOOGLE_PROJECT)
     delete_documents(db)
 
-    response = requests.post(RECEIVER_URL, json={"key": "value"})
+    new_doc = {"key": "value"}
+
+    response = requests.post(RECEIVER_URL, json=new_doc)
 
     print(response.content)
     assert response.status_code == 200
@@ -29,4 +31,4 @@ def test_receiver():
 
     actual = next(docs).to_dict()
     print(actual)
-    assert actual["key"] == "value"
+    assert actual == new_doc
