@@ -1,0 +1,29 @@
+name: 'terraform ci'
+on: workflow_dispatch
+jobs:
+  terraform:
+    name: 'Terraform destroy'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 'Checkout'
+      uses: actions/checkout@v2
+
+    - name: 'install tf'
+      uses: hashicorp/setup-terraform@v1
+
+    - name: 'tf init'
+      run: terraform init
+      working-directory: terraform
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+    - name: 'tf destroy'
+      run: |
+        echo "$BILLING_ALERT_EMAIL $GOOGLE_PROJECT"
+        terraform destroy --auto-approve -var="billing_alert_email=$BILLING_ALERT_EMAIL" -var="project=$GOOGLE_PROJECT"
+      working-directory: terraform
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        BILLING_ALERT_EMAIL: ${{ secrets.BILLING_ALERT_EMAIL }}
+        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
