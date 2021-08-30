@@ -31,7 +31,7 @@ resource "google_cloudfunctions_function" "receiver_function" {
   trigger_http          = true
   entry_point           = "receiver_function"
 
-  depends_on = google_project_service.enabled_apis
+  depends_on = [google_project_service.enabled_apis]
 }
 
 resource "google_cloudfunctions_function_iam_member" "receiver_function_invoker" {
@@ -41,5 +41,5 @@ resource "google_cloudfunctions_function_iam_member" "receiver_function_invoker"
 
   role       = "roles/cloudfunctions.invoker"
   member     = "allUsers"
-  depends_on = google_project_service.enabled_apis
+  depends_on = [google_project_service.enabled_apis]
 }
