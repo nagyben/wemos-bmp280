@@ -6,7 +6,7 @@ terraform {
 }
 
 provider "google" {
-    project = "nagyben"
-    region  = "europe-west2"
-    zone    = "europe-west2-a"
+  project = "nagyben"
+  region  = "europe-west2"
+  zone    = "europe-west2-a"
 }

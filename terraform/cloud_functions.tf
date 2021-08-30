@@ -1,6 +1,6 @@
 locals {
   timestamp = formatdate("YYMMDDhhmmss", timestamp())
-	root_dir = abspath("../cloud_functions")
+  root_dir  = abspath("../cloud_functions")
 }
 
 data "archive_file" "data_ingestion_source" {
@@ -30,6 +30,8 @@ resource "google_cloudfunctions_function" "receiver_function" {
   source_archive_object = google_storage_bucket_object.zip.name
   trigger_http          = true
   entry_point           = "receiver_function"
+
+  depends_on = google_project_service.enabled_apis
 }
 
 resource "google_cloudfunctions_function_iam_member" "receiver_function_invoker" {
@@ -37,6 +39,7 @@ resource "google_cloudfunctions_function_iam_member" "receiver_function_invoker"
   region         = google_cloudfunctions_function.receiver_function.region
   cloud_function = google_cloudfunctions_function.receiver_function.name
 
-  role   = "roles/cloudfunctions.invoker"
-  member = "allUsers"
+  role       = "roles/cloudfunctions.invoker"
+  member     = "allUsers"
+  depends_on = google_project_service.enabled_apis
 }
