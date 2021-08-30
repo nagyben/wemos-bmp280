@@ -1,4 +1,4 @@
-name: 'terraform ci'
+name: 'terraform destroy'
 on: workflow_dispatch
 jobs:
   terraform:
