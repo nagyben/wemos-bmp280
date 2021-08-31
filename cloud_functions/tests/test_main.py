@@ -18,7 +18,7 @@ def app():
 
 @pytest.fixture
 def db(monkeypatch):
-    cred = mock.Mock(spec=google.auth.credentials.Credentials)
+    cred = mock.MagicMock(spec=google.auth.credentials.Credentials)
     firebase_admin.initialize_app()
     client = firestore.Client(
         project=os.getenv("FIRESTORE_PROJECT_ID"), credentials=cred
