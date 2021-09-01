@@ -21,5 +21,6 @@ resource "google_project_service" "enabled_apis" {
     update = "5m"
   }
 
-  disable_dependent_services = true
+  disable_dependent_services = false
+  disable_dependent_services = false
 }
