@@ -22,5 +22,5 @@ resource "google_project_service" "enabled_apis" {
   }
 
   disable_dependent_services = false
-  disable_dependent_services = false
+  disable_on_destroy = false
 }
