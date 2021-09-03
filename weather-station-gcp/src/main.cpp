@@ -4,15 +4,14 @@
 #include <WiFiClientSecureBearSSL.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
+#include "config.h"
 
-struct Config {
-  char ssid[64];
-  char password[64];
-  char url[128];
-};
+//global configuration object
+Config config;
 
+// uploaded to ESP's filesystem separately
+// if the file is not present, the code won't do anything
 const char *filename = "config.json";
-Config config;                         // <- global configuration object
 
 // Loads the configuration from a file
 void loadConfiguration(const char *filename, Config &config) {
@@ -29,22 +28,19 @@ void loadConfiguration(const char *filename, Config &config) {
   if (error)
     Serial.println(F("Failed to read file, using default configuration"));
 
-  // Copy values from the JsonDocument to the Config
-  strlcpy(config.password,                  // <- destination
-          doc["password"] | "",             // <- source
-          sizeof(config.password));         // <- destination's capacity
-
-  strlcpy(config.ssid,                  // <- destination
-          doc["ssid"] | "",             // <- source
-          sizeof(config.ssid));         // <- destination's capacity
-
-  strlcpy(config.url,                  // <- destination
-          doc["url"] | "",             // <- source
-          sizeof(config.url));         // <- destination's capacity
-
   // Close the file (Curiously, File's destructor doesn't close the file)
   file.close();
-  Serial.println("Config loaded!");
+
+  // Copy values from the JsonDocument to the Config
+  String(doc["ssid"]).toCharArray(config.ssid, sizeof(config.ssid));
+  String(doc["password"]).toCharArray(config.password, sizeof(config.password));
+  String(doc["url"]).toCharArray(config.url, sizeof(config.url));
+
+  if (isConfigValid(config)) {
+    Serial.println("Config loaded!");
+  } else {
+    Serial.println("Config is invalid!");
+  }
 }
 
 String callApi() {
@@ -61,13 +57,14 @@ String callApi() {
 
     http.begin(*client, config.url);
 
+    char buffer[100];
+    sprintf(buffer, "Making request to %s", config.url);
+    Serial.println(buffer);
     int httpStatusCode = http.GET();
 
     if (httpStatusCode > 0) {
         Serial.print("HTTP Response code: ");
         Serial.println(httpStatusCode);
-        String payload = http.getString();
-        Serial.println(payload);
         payload = http.getString();
       }
       else {
@@ -75,7 +72,7 @@ String callApi() {
         Serial.println(httpStatusCode);
         payload = "error";
       }
-      // Free resources
+    // Free resources
     http.end();
   }
 
@@ -91,26 +88,27 @@ void setup() {
   loadConfiguration(filename, config);
   LittleFS.end();
 
-  WiFi.begin(config.ssid, config.password);
+  if (isConfigValid(config)) {
+    WiFi.begin(config.ssid, config.password);
+    char buffer[100];
+    sprintf(buffer, "Connecting to %s using password %s...", config.ssid, config.password);
+    Serial.print(buffer);
+    while (WiFi.status() != WL_CONNECTED)
+    {
+      delay(500);
+      Serial.print(".");
+    }
+    Serial.println();
 
+    Serial.print("Connected, IP address: ");
+    Serial.println(WiFi.localIP());
 
-  char buffer[100];
-  sprintf(buffer, "Connecting to %s using password %s...", config.ssid, config.password);
-  Serial.print(buffer);
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
+    Serial.println(callApi());
   }
-  Serial.println();
-
-  Serial.print("Connected, IP address: ");
-  Serial.println(WiFi.localIP());
-
-  Serial.println(callApi());
-
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  if (isConfigValid(config)) {
+
+  }
 }
