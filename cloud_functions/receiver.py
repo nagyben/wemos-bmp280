@@ -23,5 +23,5 @@ def receiver(request):
 
 
 def _get_firestore_client():
-    LOG.info("Getting firestore client...")
+    print("Getting firestore client...")
     return firestore.Client()
