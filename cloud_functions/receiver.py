@@ -2,13 +2,13 @@ import logging
 import os
 import unittest.mock as mock
 
-from firebase_admin import firestore
-
 import google.cloud.logging
+from firebase_admin import firestore
 from google.cloud.logging.handlers import CloudLoggingHandler, setup_logging
+
 client = google.cloud.logging.Client()
 handler = CloudLoggingHandler(client)
-logging.getLogger().setLevel(logging.DEBUG) # defaults to WARN
+logging.getLogger().setLevel(logging.DEBUG)  # defaults to WARN
 setup_logging(handler)
 LOG = logging.getLogger(__name__)
 
