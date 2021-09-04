@@ -3,7 +3,10 @@
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecureBearSSL.h>
 #include <LittleFS.h>
-#include <ArduinoJson.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_BME280.h>
+
 #include <config.h>
 #include <api.h>
 
@@ -16,6 +19,10 @@ const char *filename = "config.json";
 
 BearSSL::WiFiClientSecure *client;
 HTTPClient http;
+
+Adafruit_BME280 bme;
+
+String bmeSensorJson();
 
 void setup() {
   client = new BearSSL::WiFiClientSecure;
@@ -49,7 +56,17 @@ void setup() {
   Serial.print("Connected, IP address: ");
   Serial.println(WiFi.localIP());
 
-  Serial.println(callApi(*client, http, config.url));
+
+  if (!bme.begin()) {
+    Serial.println("Could not initialize BMP280 - check wiring!");
+  }
+
+  String jsonData = bmeSensorJson();
+
+  Serial.println(jsonData);
+
+  Serial.println(postData(*client, http, config.url, jsonData.c_str()));
+
 }
 
 void loop() {
@@ -61,4 +78,22 @@ void loop() {
     delay(500);
     return;
   }
+
+  String jsonData = bmeSensorJson();
+
+  Serial.println(jsonData);
+
+  delay(1000);
+}
+
+String bmeSensorJson() {
+  DynamicJsonDocument data(128);
+
+  data["temp_C"] = bme.readTemperature();
+  data["pressure_Pa"] = bme.readPressure();
+  data["humidity_%"] = bme.readHumidity();
+  String jsonData;
+  serializeJson(data, jsonData);
+
+  return jsonData;
 }

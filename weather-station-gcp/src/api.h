@@ -1,21 +1,20 @@
 #ifndef API_H
 #define API_H
 
-#include <Arduino.h>
+#include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecureBearSSL.h>
-#include <config.h>
 
-String callApi(WiFiClient &client, HTTPClient &http, char * url)
+String postData(WiFiClient &client, HTTPClient &http, const char* url, const char* data)
 {
   String payload = "disconnected";
 
   http.begin(client, url);
 
-  char buffer[100];
-  sprintf(buffer, "Making request to %s", url);
+  char buffer[512];
+  sprintf(buffer, "Making request to %s with data %s", url, data);
   Serial.println(buffer);
-  int httpStatusCode = http.GET();
+  int httpStatusCode = http.POST(data);
 
   if (httpStatusCode > 0)
   {
