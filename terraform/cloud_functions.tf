@@ -30,7 +30,7 @@ resource "google_cloudfunctions_function" "receiver_function" {
   source_archive_object = google_storage_bucket_object.zip.name
   trigger_http          = true
   entry_point           = "receiver_function"
-
+  max_instances         = 1
 }
 
 resource "google_cloudfunctions_function_iam_member" "receiver_function_invoker" {
