@@ -4,6 +4,12 @@ import unittest.mock as mock
 
 from firebase_admin import firestore
 
+import google.cloud.logging
+from google.cloud.logging.handlers import CloudLoggingHandler, setup_logging
+client = google.cloud.logging.Client()
+handler = CloudLoggingHandler(client)
+logging.getLogger().setLevel(logging.DEBUG) # defaults to WARN
+setup_logging(handler)
 LOG = logging.getLogger(__name__)
 
 
@@ -17,7 +23,7 @@ def receiver(request):
         `make_response <https://flask.palletsprojects.com/en/1.1.x/api/#flask.Flask.make_response>`.
     """
     db = _get_firestore_client()
-
+    LOG.debug(request.json)
     LOG.debug("Inserting shtuff")
     db.collection("weather").document("test").set({"key": "value"})
 
