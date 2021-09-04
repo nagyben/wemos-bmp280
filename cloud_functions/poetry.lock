@@ -227,31 +227,6 @@ httplib2 = ">=0.15.0"
 six = "*"
 
 [[package]]
-name = "google-cloud-appengine-logging"
-version = "0.1.4"
-description = ""
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-google-api-core = {version = ">=1.22.2,<3.0.0dev", extras = ["grpc"]}
-packaging = ">=14.3"
-proto-plus = ">=1.15.0"
-
-[[package]]
-name = "google-cloud-audit-log"
-version = "0.1.1"
-description = "Google Cloud Audit Protos"
-category = "main"
-optional = false
-python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
-
-[package.dependencies]
-googleapis-common-protos = ">=1.52.0"
-protobuf = ">=3.6.0"
-
-[[package]]
 name = "google-cloud-core"
 version = "2.0.0"
 description = "Google Cloud API client core library"
@@ -280,22 +255,6 @@ google-cloud-core = ">=1.4.1,<3.0.0dev"
 packaging = ">=14.3"
 proto-plus = ">=1.10.0"
 pytz = "*"
-
-[[package]]
-name = "google-cloud-logging"
-version = "2.6.0"
-description = "Stackdriver Logging API client library"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-google-api-core = {version = ">=1.26.0,<3.0.0dev", extras = ["grpc"]}
-google-cloud-appengine-logging = ">=0.1.0,<1.0.0dev"
-google-cloud-audit-log = ">=0.1.0,<1.0.0dev"
-google-cloud-core = ">=1.4.1,<3.0.0dev"
-packaging = ">=14.3"
-proto-plus = ">=1.11.0"
 
 [[package]]
 name = "google-cloud-storage"
@@ -679,7 +638,7 @@ watchdog = ["watchdog"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "d19eb4db4bb3bcbe85b0befc8ee4530a74bad3fb3f803e40ce1244e1660d6c88"
+content-hash = "970ecd03c5a0a8bb172855387ad3a12d7a7b46a3a69405575ffb0a1f2f0fa5f4"
 
 [metadata.files]
 appdirs = [
@@ -793,14 +752,6 @@ google-auth-httplib2 = [
     {file = "google-auth-httplib2-0.1.0.tar.gz", hash = "sha256:a07c39fd632becacd3f07718dfd6021bf396978f03ad3ce4321d060015cc30ac"},
     {file = "google_auth_httplib2-0.1.0-py2.py3-none-any.whl", hash = "sha256:31e49c36c6b5643b57e82617cb3e021e3e1d2df9da63af67252c02fa9c1f4a10"},
 ]
-google-cloud-appengine-logging = [
-    {file = "google-cloud-appengine-logging-0.1.4.tar.gz", hash = "sha256:d44fb77d7706b086d387b9d79c139c553d54b58ddc8ee967bbf32a53e7bbee56"},
-    {file = "google_cloud_appengine_logging-0.1.4-py2.py3-none-any.whl", hash = "sha256:0f5cea4f2b45e12a34e15285b967d903dcf9ded6bb06959fdcd23e3eeec1f2e9"},
-]
-google-cloud-audit-log = [
-    {file = "google-cloud-audit-log-0.1.1.tar.gz", hash = "sha256:a87fdf3c393b830b35c8f7db09094790d0d7babb35068736bea64e1618d286fe"},
-    {file = "google_cloud_audit_log-0.1.1-py2.py3-none-any.whl", hash = "sha256:33a8e5fdc9d98c1c0b4b0502d723941215a586c04ccc44558ec63c16e9194152"},
-]
 google-cloud-core = [
     {file = "google-cloud-core-2.0.0.tar.gz", hash = "sha256:90ee99648ccf9e11a16781a7fc58d13e58f662b439c737d48c24ef18662c2702"},
     {file = "google_cloud_core-2.0.0-py2.py3-none-any.whl", hash = "sha256:31785d1e1d02f90ad3f1b020d4aed63db4865c3394ff7c128a296b6995eef31f"},
@@ -808,10 +759,6 @@ google-cloud-core = [
 google-cloud-firestore = [
     {file = "google-cloud-firestore-2.2.0.tar.gz", hash = "sha256:40cc2f30f79b0b66b4f5798a40a6053f05486d9967504697c5387c8659d2f49b"},
     {file = "google_cloud_firestore-2.2.0-py2.py3-none-any.whl", hash = "sha256:458a1eb4766cc91ef7473355645b22da501fb5a8c36c4ac9c7dab460f60b2966"},
-]
-google-cloud-logging = [
-    {file = "google-cloud-logging-2.6.0.tar.gz", hash = "sha256:499eed5f13cab805c8780b0d14a0d931a9ff1d65efccdd9e68772d40e7dad4c5"},
-    {file = "google_cloud_logging-2.6.0-py2.py3-none-any.whl", hash = "sha256:abf404c2823d4fdff5e86cd869d77e6fda8d40096cbab897bc78a11f59096a3c"},
 ]
 google-cloud-storage = [
     {file = "google-cloud-storage-1.42.0.tar.gz", hash = "sha256:c1dd3d09198edcf24ec6803dd4545e867d82b998f06a68ead3b6857b1840bdae"},
