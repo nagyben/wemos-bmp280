@@ -10,6 +10,19 @@
 #include <config.h>
 #include <api.h>
 
+#define DEBUG
+#ifdef DEBUG
+  #define print(x)  Serial.print (x)
+  #define println(x)  Serial.println (x)
+#else
+  #define print(x)
+  #define println(x)
+#endif
+
+ADC_MODE(ADC_VCC);
+
+#define BME_VCC_PIN 3
+
 //global configuration object
 Config config;
 
@@ -22,18 +35,23 @@ HTTPClient http;
 
 Adafruit_BME280 bme;
 
-String bmeSensorJson();
+DynamicJsonDocument bmeSensorJson();
 
 void setup() {
-  client = new BearSSL::WiFiClientSecure;
-  // client->setFingerprint(fingerprint);
-  // Or, if you happy to ignore the SSL certificate, then use the following line instead:
-  client->setInsecure();
-
+  WiFi.forceSleepBegin();
+  yield();
+  // =================================================
+  // Serial
+  // =================================================
+#ifdef DEBUG
   Serial.begin(115200);
+#endif
 
+  // =================================================
+  // Filesystem & load config
+  // =================================================
   if (!LittleFS.begin()) {
-    Serial.println("Could not mount filesystem!");
+    println("Could not mount filesystem!");
   }
   loadConfiguration(filename, config);
   LittleFS.end();
@@ -42,58 +60,68 @@ void setup() {
     return;
   }
 
+  // =================================================
+  // Wifi Client
+  // =================================================
+
+  WiFi.forceSleepWake();
+  WiFi.mode(WIFI_STA);
+  client = new BearSSL::WiFiClientSecure;
+  // client->setFingerprint(fingerprint);
+  // Or, if you happy to ignore the SSL certificate, then use the following line instead:
+  client->setInsecure();
   WiFi.begin(config.ssid, config.password);
-  char buffer[100];
-  sprintf(buffer, "Connecting to %s using password %s...", config.ssid, config.password);
-  Serial.print(buffer);
+  print("Connecting to "); print(config.ssid);
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
-    Serial.print(".");
+    print(".");
   }
-  Serial.println();
+  println();
 
-  Serial.print("Connected, IP address: ");
-  Serial.println(WiFi.localIP());
+  print("Connected, IP address: ");
+  println(WiFi.localIP());
 
 
-  if (!bme.begin()) {
-    Serial.println("Could not initialize BMP280 - check wiring!");
-  }
+  // =================================================
+  // BME280
+  // =================================================
 
-  String jsonData = bmeSensorJson();
 
-  Serial.println(jsonData);
-
-  Serial.println(postData(*client, http, config.url, jsonData.c_str()));
-
-}
-
-void loop() {
-  if (!isConfigValid(config)) {
-    return;
-  }
-
-  if (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    return;
-  }
-
-  String jsonData = bmeSensorJson();
-
-  Serial.println(jsonData);
-
-  delay(1000);
-}
-
-String bmeSensorJson() {
   DynamicJsonDocument data(128);
-
-  data["temp_C"] = bme.readTemperature();
-  data["pressure_Pa"] = bme.readPressure();
-  data["humidity_%"] = bme.readHumidity();
+  bmeSensorJson(&data);
   String jsonData;
   serializeJson(data, jsonData);
 
-  return jsonData;
+  println(jsonData);
+
+  // println(postData(*client, http, config.url, jsonData.c_str()));
+
+  digitalWrite(BME_VCC_PIN, LOW);
+  println("Deep sleeping...");
+  ESP.deepSleep(5e6);
+  yield();
+}
+
+void loop() {}
+
+void bmeSensorJson(DynamicJsonDocument *data) {
+  pinMode(BME_VCC_PIN, OUTPUT);
+  digitalWrite(BME_VCC_PIN, HIGH);
+  if (!bme.begin()) {
+    println("Could not initialize BMP280 - check wiring!");
+    return "error";
+  }
+  bme.setSampling(Adafruit_BME280::MODE_FORCED,
+                  Adafruit_BME280::SAMPLING_X1, // temp
+                  Adafruit_BME280::SAMPLING_X1, // pressure
+                  Adafruit_BME280::SAMPLING_X1, // humidity
+                  Adafruit_BME280::FILTER_OFF
+                  );
+  bme.takeForcedMeasurement();
+  digitalWrite(BME_VCC_PIN, LOW);
+  data["temp_C"] = bme.readTemperature();
+  data["pressure_Pa"] = bme.readPressure();
+  data["humidity_%"] = bme.readHumidity();
+  data["Vcc"] = ESP.getVcc();
 }
