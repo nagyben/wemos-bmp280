@@ -7,9 +7,10 @@
 
 String postData(WiFiClient &client, HTTPClient &http, const char* url, const char* data)
 {
-  String payload = "disconnected";
+  String payload = "";
 
   http.begin(client, url);
+  http.addHeader("content-type", "application/json");
 
   char buffer[512];
   sprintf(buffer, "Making request to %s with data %s", url, data);
@@ -26,7 +27,6 @@ String postData(WiFiClient &client, HTTPClient &http, const char* url, const cha
   {
     Serial.print("Error code: ");
     Serial.println(httpStatusCode);
-    payload = "error";
   }
   // Free resources
   http.end();
