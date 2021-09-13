@@ -19,9 +19,8 @@
   #define println(x)
 #endif
 
-ADC_MODE(ADC_VCC);
-
 #define BME_VCC_PIN 3
+#define BATTERY_VCC_PIN A0
 
 //global configuration object
 Config config;
@@ -35,9 +34,10 @@ HTTPClient http;
 
 Adafruit_BME280 bme;
 
-DynamicJsonDocument bmeSensorJson();
+void bmeSensorJson(DynamicJsonDocument &d);
 
 void setup() {
+  long start = millis();
   WiFi.forceSleepBegin();
   yield();
   // =================================================
@@ -70,6 +70,7 @@ void setup() {
   // client->setFingerprint(fingerprint);
   // Or, if you happy to ignore the SSL certificate, then use the following line instead:
   client->setInsecure();
+  long preConnectTime = millis();
   WiFi.begin(config.ssid, config.password);
   print("Connecting to "); print(config.ssid);
   while (WiFi.status() != WL_CONNECTED)
@@ -77,6 +78,7 @@ void setup() {
     delay(500);
     print(".");
   }
+  long postConnectTime = millis();
   println();
 
   print("Connected, IP address: ");
@@ -86,16 +88,21 @@ void setup() {
   // =================================================
   // BME280
   // =================================================
-
-
   DynamicJsonDocument data(128);
-  bmeSensorJson(&data);
+  data["wifiConnecTime_ms"] = postConnectTime - preConnectTime;
+  data["Vcc"] = analogRead(BATTERY_VCC_PIN);
+  bmeSensorJson(data);
   String jsonData;
   serializeJson(data, jsonData);
 
   println(jsonData);
+  long preHttpCallTime = millis();
+  println(postData(*client, http, config.url, jsonData.c_str()));
+  long postHttpCallTime = millis();
 
-  // println(postData(*client, http, config.url, jsonData.c_str()));
+  print("Wifi connect time: "); print(postConnectTime - preConnectTime); println("ms");
+  print("Http call time: "); print(postHttpCallTime - preHttpCallTime); println("ms");
+  print("Total time:"); print(postHttpCallTime - start); println("ms");
 
   digitalWrite(BME_VCC_PIN, LOW);
   println("Deep sleeping...");
@@ -105,12 +112,11 @@ void setup() {
 
 void loop() {}
 
-void bmeSensorJson(DynamicJsonDocument *data) {
+void bmeSensorJson(DynamicJsonDocument &data) {
   pinMode(BME_VCC_PIN, OUTPUT);
   digitalWrite(BME_VCC_PIN, HIGH);
   if (!bme.begin()) {
     println("Could not initialize BMP280 - check wiring!");
-    return "error";
   }
   bme.setSampling(Adafruit_BME280::MODE_FORCED,
                   Adafruit_BME280::SAMPLING_X1, // temp
@@ -118,10 +124,10 @@ void bmeSensorJson(DynamicJsonDocument *data) {
                   Adafruit_BME280::SAMPLING_X1, // humidity
                   Adafruit_BME280::FILTER_OFF
                   );
+  delay(1000);
   bme.takeForcedMeasurement();
   digitalWrite(BME_VCC_PIN, LOW);
   data["temp_C"] = bme.readTemperature();
   data["pressure_Pa"] = bme.readPressure();
   data["humidity_%"] = bme.readHumidity();
-  data["Vcc"] = ESP.getVcc();
 }
