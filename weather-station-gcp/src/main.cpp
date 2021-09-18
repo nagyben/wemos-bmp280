@@ -10,7 +10,7 @@
 #include <config.h>
 #include <api.h>
 
-#define DEBUG
+// #define DEBUG
 #ifdef DEBUG
   #define print(x)  Serial.print (x)
   #define println(x)  Serial.println (x)
@@ -33,6 +33,9 @@ BearSSL::WiFiClientSecure *client;
 HTTPClient http;
 
 Adafruit_BME280 bme;
+
+const long DEEPSLEEP_TIME = 5 /*minutes*/ * 60 /*seconds*/ * 1e6 /*microseconds*/;
+const int MAX_WIFI_CONNECT_TIME = 10 * 1e3; // milliseconds
 
 void bmeSensorJson(DynamicJsonDocument &d);
 
@@ -77,6 +80,11 @@ void setup() {
   {
     delay(500);
     print(".");
+    if (millis() - preConnectTime > MAX_WIFI_CONNECT_TIME) {
+      println("WiFi failed to connect within power budget");
+      println("Deep sleeping...");
+      ESP.deepSleep(DEEPSLEEP_TIME);
+    }
   }
   long postConnectTime = millis();
   println();
@@ -106,8 +114,7 @@ void setup() {
 
   digitalWrite(BME_VCC_PIN, LOW);
   println("Deep sleeping...");
-  ESP.deepSleep(5e6);
-  yield();
+  ESP.deepSleep(DEEPSLEEP_TIME);
 }
 
 void loop() {}
