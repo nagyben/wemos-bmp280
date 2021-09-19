@@ -4,6 +4,13 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
+#ifndef DEBUG_PRINT
+  #define DEBUG_PRINT(x)
+#endif
+#ifndef DEBUG_PRINTLN
+  #define DEBUG_PRINTLN(x)
+#endif
+
 struct Config {
   char ssid[128];
   char password[128];
@@ -12,15 +19,15 @@ struct Config {
 
 bool isConfigValid(Config &config) {
   return !(
-    strcmp(config.ssid, "") == 0
-    | strcmp(config.password, "") == 0
-    | strcmp(config.url, "") == 0
+    (strcmp(config.ssid, "") == 0)
+    | (strcmp(config.password, "") == 0)
+    | (strcmp(config.url, "") == 0)
   );
 }
 
 // Loads the configuration from a file
 void loadConfiguration(const char *filename, Config &config) {
-  Serial.println("Loading config...");
+  DEBUG_PRINTLN("Loading config...");
   File file = LittleFS.open(filename, "r");
 
   // Allocate a temporary JsonDocument
@@ -31,7 +38,7 @@ void loadConfiguration(const char *filename, Config &config) {
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, file);
   if (error)
-    Serial.println(F("Failed to read file, using default configuration"));
+    DEBUG_PRINTLN(F("Failed to read file, using default configuration"));
 
   // Close the file (Curiously, File's destructor doesn't close the file)
   file.close();
@@ -42,9 +49,9 @@ void loadConfiguration(const char *filename, Config &config) {
   String(doc["url"]).toCharArray(config.url, sizeof(config.url));
 
   if (isConfigValid(config)) {
-    Serial.println("Config loaded!");
+    DEBUG_PRINTLN("Config loaded!");
   } else {
-    Serial.println("Config is invalid!");
+    DEBUG_PRINTLN("Config is invalid!");
   }
 }
 

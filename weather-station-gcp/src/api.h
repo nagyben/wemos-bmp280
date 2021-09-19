@@ -1,9 +1,17 @@
 #ifndef API_H
 #define API_H
 
+#include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecureBearSSL.h>
+
+#ifndef DEBUG_PRINT
+  #define DEBUG_PRINT(x)
+#endif
+#ifndef DEBUG_PRINTLN
+  #define DEBUG_PRINTLN(x)
+#endif
 
 String postData(WiFiClient &client, HTTPClient &http, const char* url, const char* data)
 {
@@ -14,19 +22,25 @@ String postData(WiFiClient &client, HTTPClient &http, const char* url, const cha
 
   char buffer[512];
   sprintf(buffer, "Making request to %s with data %s", url, data);
-  Serial.println(buffer);
+  DEBUG_PRINTLN(buffer);
   int httpStatusCode = http.POST(data);
 
   if (httpStatusCode > 0)
   {
-    Serial.print("HTTP Response code: ");
-    Serial.println(httpStatusCode);
+    DEBUG_PRINT("HTTP Response code: ");
+    DEBUG_PRINTLN(httpStatusCode);
     payload = http.getString();
+    for (int i = 0; i < 3; i++) {
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(750);
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(200);
+    }
   }
   else
   {
-    Serial.print("Error code: ");
-    Serial.println(httpStatusCode);
+    DEBUG_PRINT("Error code: ");
+    DEBUG_PRINTLN(httpStatusCode);
   }
   // Free resources
   http.end();
