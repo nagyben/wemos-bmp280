@@ -23,10 +23,14 @@ def app():
     return flask.Flask(__name__)
 
 
+@pytest.fixture(scope="module")
+def firebase():
+    firebase_admin.initialize_app()
+
+
 @pytest.fixture
 def db(monkeypatch):
     cred = mock.MagicMock(spec=google.auth.credentials.Credentials)
-    firebase_admin.initialize_app()
     client = firestore.Client(
         project=os.getenv("FIRESTORE_PROJECT_ID"), credentials=cred
     )
@@ -42,16 +46,51 @@ def empty_db(db):
 
 # https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/functions/helloworld/main_test.py
 @freezegun.freeze_time("2020-01-01")
-def test_adds_entry_for_date(app, db, empty_db):
+def test_adds_entry_for_date(firebase, app, db, empty_db):
     data = {"key": "value"}
+    expected_key = "20200101"
     expected_doc = {
-        "20200101": [{"timestamp": datetime.datetime.now().isoformat(), **data}]
+        "date": "2020-01-01",
+        "data": [{"timestamp": datetime.datetime.now().isoformat(), **data}],
     }
     with app.test_request_context(json=data):
         assert main.receiver_function(flask.request) == "OK"
 
-        docs = db.collection(u"weather").stream()
-
-        actual_doc = next(docs).to_dict()
+        actual_doc = db.collection(u"weather").document(expected_key).get()
+        assert actual_doc.exists
         print(actual_doc)
-        assert actual_doc == expected_doc
+        assert actual_doc.to_dict() == expected_doc
+
+
+@freezegun.freeze_time("2020-01-01 00:15:00")
+def test_adds_entry_to_existing_entries_on_same_day(firebase, app, db, empty_db):
+    data = {"key": "value"}
+    expected_key = "20200101"
+    db.collection(u"weather").document(expected_key).set(
+        {
+            "date": "2020-01-01",
+            "data": [
+                {"timestamp": datetime.datetime(2020, 1, 1, 0, 0).isoformat(), **data},
+                {"timestamp": datetime.datetime(2020, 1, 1, 0, 5).isoformat(), **data},
+                {"timestamp": datetime.datetime(2020, 1, 1, 0, 10).isoformat(), **data},
+            ],
+        }
+    )
+
+    expected_doc = {
+        "date": "2020-01-01",
+        "data": [
+            {"timestamp": datetime.datetime(2020, 1, 1, 0, 0).isoformat(), **data},
+            {"timestamp": datetime.datetime(2020, 1, 1, 0, 5).isoformat(), **data},
+            {"timestamp": datetime.datetime(2020, 1, 1, 0, 10).isoformat(), **data},
+            {"timestamp": datetime.datetime(2020, 1, 1, 0, 15).isoformat(), **data},
+        ],
+    }
+
+    with app.test_request_context(json=data):
+        assert main.receiver_function(flask.request) == "OK"
+
+        actual_doc = db.collection(u"weather").document(expected_key).get()
+        assert actual_doc.exists
+        print(actual_doc)
+        assert actual_doc.to_dict() == expected_doc

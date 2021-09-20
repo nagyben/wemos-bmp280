@@ -27,13 +27,21 @@ def receiver(request):
     db = _get_firestore_client()
     logging.debug(request.json)
 
-    db.collection("weather").document("test").set(
-        {
-            datetime.datetime.now().strftime("%Y%m%d"): [
-                {"timestamp": datetime.datetime.now().isoformat(), **request.json}
-            ]
-        }
-    )
+    doc = db.collection("weather").document(datetime.datetime.now().strftime("%Y%m%d"))
+
+    if not doc.get().exists:
+        doc.set(
+            {
+                "date": datetime.datetime.now().strftime("%Y-%m-%d"),
+                "data": [
+                    {"timestamp": datetime.datetime.now().isoformat(), **request.json}
+                ],
+            }
+        )
+    else:
+        data = doc.get().to_dict()["data"]
+        data.append({"timestamp": datetime.datetime.now().isoformat(), **request.json})
+        doc.update({"data": data})
 
     return f"OK"
 
