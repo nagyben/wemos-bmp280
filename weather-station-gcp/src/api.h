@@ -30,12 +30,6 @@ String postData(WiFiClient &client, HTTPClient &http, const char* url, const cha
     DEBUG_PRINT("HTTP Response code: ");
     DEBUG_PRINTLN(httpStatusCode);
     payload = http.getString();
-    for (int i = 0; i < 3; i++) {
-      digitalWrite(LED_BUILTIN, LOW);
-      delay(750);
-      digitalWrite(LED_BUILTIN, HIGH);
-      delay(200);
-    }
   }
   else
   {

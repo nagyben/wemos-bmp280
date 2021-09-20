@@ -75,19 +75,15 @@ void setup() {
   long preConnectTime = millis();
   WiFi.begin(config.ssid, config.password);
   DEBUG_PRINT("Connecting to "); DEBUG_PRINT(config.ssid);
-  pinMode(LED_BUILTIN, OUTPUT);
   while (WiFi.status() != WL_CONNECTED)
   {
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(100);
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(300);
     DEBUG_PRINT(".");
     if (millis() - preConnectTime > MAX_WIFI_CONNECT_TIME) {
       DEBUG_PRINTLN("WiFi failed to connect within power budget");
       DEBUG_PRINTLN("Deep sleeping...");
       ESP.deepSleep(DEEPSLEEP_TIME);
     }
+    delay(500);
   }
   long postConnectTime = millis();
   DEBUG_PRINTLN();
