@@ -89,6 +89,12 @@ jobs:
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
+    - name: 'tf validate'
+      run: terraform validate
+      working-directory: terraform
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
     - name: 'tf plan'
       run: terraform plan -var="billing_alert_email=$BILLING_ALERT_EMAIL" -var="project=$GOOGLE_PROJECT"
       working-directory: terraform
