@@ -34,7 +34,7 @@ HTTPClient http;
 
 Adafruit_BME280 bme;
 
-const long DEEPSLEEP_TIME =  5 * 1e6 /*microseconds*/;
+const long DEEPSLEEP_TIME = 5 * 60 * 1e6; // microseconds
 const int MAX_WIFI_CONNECT_TIME = 100 * 1e3; // milliseconds
 
 void bmeSensorJson(DynamicJsonDocument &d);
