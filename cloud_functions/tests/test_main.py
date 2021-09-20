@@ -1,14 +1,21 @@
+import datetime
 import os
 import unittest.mock as mock
 
 import firebase_admin
 import flask
+import freezegun
 import google.auth.credentials
 import pytest
 from google.cloud import firestore
 
 import main
 import receiver
+
+
+@pytest.fixture(autouse=True)
+def logging(monkeypatch):
+    monkeypatch.setattr(receiver, "cloudlogging", mock.MagicMock())
 
 
 @pytest.fixture(scope="module")
@@ -34,8 +41,12 @@ def empty_db(db):
 
 
 # https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/functions/helloworld/main_test.py
-def test_receiver(app, db, empty_db):
+@freezegun.freeze_time("2020-01-01")
+def test_adds_entry_for_date(app, db, empty_db):
     data = {"key": "value"}
+    expected_doc = {
+        "20200101": [{"timestamp": datetime.datetime.now().isoformat(), **data}]
+    }
     with app.test_request_context(json=data):
         assert main.receiver_function(flask.request) == "OK"
 
@@ -43,4 +54,4 @@ def test_receiver(app, db, empty_db):
 
         actual_doc = next(docs).to_dict()
         print(actual_doc)
-        assert actual_doc == data
+        assert actual_doc == expected_doc

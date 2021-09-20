@@ -9,12 +9,14 @@ python = "^3.9"
 google-cloud-firestore = "^2.2.0"
 firebase-admin = "^5.0.2"
 requests = "^2.26.0"
+google-cloud-logging = "^2.6.0"
 
 [tool.poetry.dev-dependencies]
 black = "^21.7b0"
 pytest = "^6.2.4"
 isort = "^5.9.3"
 Flask = "^2.0.1"
+freezegun = "^1.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
