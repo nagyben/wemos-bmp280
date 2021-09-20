@@ -1,7 +1,7 @@
 resource "random_password" "shared_secret" {
   length = 16
 
-  keepers {
+  keepers = {
     version = 1
   }
 }
