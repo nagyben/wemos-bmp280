@@ -7,7 +7,7 @@
 #include <SPI.h>
 #include <Adafruit_BME280.h>
 
-#define DEBUG
+// #define DEBUG
 #ifdef DEBUG
   #define DEBUG_PRINT(x)  Serial.print (x)
   #define DEBUG_PRINTLN(x)  Serial.println (x)
