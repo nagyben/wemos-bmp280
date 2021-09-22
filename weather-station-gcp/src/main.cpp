@@ -104,7 +104,8 @@ void setup() {
 
   DEBUG_PRINTLN(jsonData);
   long preHttpCallTime = millis();
-  DEBUG_PRINTLN(postData(*client, http, config.url, jsonData.c_str()));
+  String postResult = postData(*client, http, config.url, jsonData.c_str());
+  DEBUG_PRINTLN(postResult);
   long postHttpCallTime = millis();
 
   DEBUG_PRINT("Wifi connect time: "); DEBUG_PRINT(postConnectTime - preConnectTime); DEBUG_PRINTLN("ms");
