@@ -39,8 +39,14 @@ const int MAX_WIFI_CONNECT_TIME = 100 * 1e3; // milliseconds
 
 void bmeSensorJson(DynamicJsonDocument &d);
 
+IPAddress ip( 192, 168, 1, 132 );
+IPAddress gateway( 192, 168, 1, 1 );
+IPAddress subnet( 255, 255, 255, 0 );
+
 void setup() {
   WiFi.forceSleepBegin();
+  yield(); // IMPORTANT! This line allows the ESP to switch of the radio
+
   long start = millis();
   // =================================================
   // Serial
@@ -69,11 +75,11 @@ void setup() {
   // Wifi Client
   // =================================================
   WiFi.forceSleepWake();
+  yield(); // IMPORTANT!
+
+  WiFi.persistent( false ); // Disable the WiFi persistence.  The ESP8266 will not load and save WiFi settings in the flash memory.
+
   WiFi.mode(WIFI_STA);
-  client = new BearSSL::WiFiClientSecure;
-  // client->setFingerPrint(fingerprint);
-  // Or, if you happy to ignore the SSL certificate, then use the following line instead:
-  client->setInsecure();
   long preConnectTime = millis();
   WiFi.begin(config.ssid, config.password);
   DEBUG_PRINT("Connecting to "); DEBUG_PRINT(config.ssid);
@@ -107,6 +113,10 @@ void setup() {
 
   DEBUG_PRINTLN(jsonData);
   long preHttpCallTime = millis();
+  client = new BearSSL::WiFiClientSecure;
+  // client->setFingerPrint(fingerprint);
+  // Or, if you happy to ignore the SSL certificate, then use the following line instead:
+  client->setInsecure();
   String postResult = postData(*client, http, config.url, jsonData.c_str());
   DEBUG_PRINTLN(postResult);
   long postHttpCallTime = millis();
@@ -115,6 +125,10 @@ void setup() {
   DEBUG_PRINT("Http call time: "); DEBUG_PRINT(postHttpCallTime - preHttpCallTime); DEBUG_PRINTLN("ms");
   DEBUG_PRINT("Total time:"); DEBUG_PRINT(postHttpCallTime - start); DEBUG_PRINTLN("ms");
 
+  WiFi.disconnect( true );
+  delay( 1 );
+  // WAKE_RF_DISABLED to keep the WiFi radio disabled when we wake up
+  ESP.deepSleep( SLEEPTIME, WAKE_RF_DISABLED );
   DEBUG_PRINTLN("Deep sleeping...");
   ESP.deepSleep(DEEPSLEEP_TIME);
 }
