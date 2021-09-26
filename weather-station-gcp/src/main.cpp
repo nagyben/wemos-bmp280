@@ -49,6 +49,8 @@ void setup() {
   Serial.begin(115200);
 #endif
 
+  DEBUG_PRINT("Code version "); DEBUG_PRINTLN(GIT_REV);
+
   // =================================================
   // Filesystem & load config
   // =================================================
@@ -98,6 +100,7 @@ void setup() {
   DynamicJsonDocument data(128);
   data["wifiConnecTime_ms"] = postConnectTime - preConnectTime;
   data["Vcc"] = analogRead(BATTERY_VCC_PIN);
+  data["git_rev"] = GIT_REV;
   bmeSensorJson(data);
   String jsonData;
   serializeJson(data, jsonData);
