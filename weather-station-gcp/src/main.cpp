@@ -7,7 +7,7 @@
 #include <SPI.h>
 #include <Adafruit_BME280.h>
 
-// #define DEBUG
+#define DEBUG
 #ifdef DEBUG
   #define DEBUG_PRINT(x)  Serial.print (x)
   #define DEBUG_PRINTLN(x)  Serial.println (x)
@@ -49,74 +49,79 @@ void setup() {
   Serial.begin(115200);
 #endif
 
-  DEBUG_PRINT("Code version "); DEBUG_PRINTLN(GIT_REV);
+  DEBUG_PRINTLN("Code version "); DEBUG_PRINTLN(GIT_REV);
+  const unsigned char payload[] = "hello";
+  char output[500];
+  getJWT(payload, output);
 
-  // =================================================
-  // Filesystem & load config
-  // =================================================
-  bool fsStatus = LittleFS.begin();
-  if (!fsStatus) {
-    DEBUG_PRINTLN("Could not mount filesystem!");
-  }
-  loadConfiguration(filename, config);
-  LittleFS.end();
+  DEBUG_PRINTLN(output);
 
-  if (!isConfigValid(config)) {
-    return;
-  }
+  // // =================================================
+  // // Filesystem & load config
+  // // =================================================
+  // bool fsStatus = LittleFS.begin();
+  // if (!fsStatus) {
+  //   DEBUG_PRINTLN("Could not mount filesystem!");
+  // }
+  // loadConfiguration(filename, config);
+  // LittleFS.end();
 
-  // =================================================
-  // Wifi Client
-  // =================================================
-  WiFi.forceSleepWake();
-  WiFi.mode(WIFI_STA);
-  client = new BearSSL::WiFiClientSecure;
-  // client->setFingerPrint(fingerprint);
-  // Or, if you happy to ignore the SSL certificate, then use the following line instead:
-  client->setInsecure();
-  long preConnectTime = millis();
-  WiFi.begin(config.ssid, config.password);
-  DEBUG_PRINT("Connecting to "); DEBUG_PRINT(config.ssid);
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    DEBUG_PRINT(".");
-    if (millis() - preConnectTime > MAX_WIFI_CONNECT_TIME) {
-      DEBUG_PRINTLN("WiFi failed to connect within power budget");
-      DEBUG_PRINTLN("Deep sleeping...");
-      ESP.deepSleep(DEEPSLEEP_TIME);
-    }
-    delay(500);
-  }
-  long postConnectTime = millis();
-  DEBUG_PRINTLN();
+  // if (!isConfigValid(config)) {
+  //   return;
+  // }
 
-  DEBUG_PRINT("Connected, IP address: ");
-  DEBUG_PRINTLN(WiFi.localIP());
+  // // =================================================
+  // // Wifi Client
+  // // =================================================
+  // WiFi.forceSleepWake();
+  // WiFi.mode(WIFI_STA);
+  // client = new BearSSL::WiFiClientSecure;
+  // // client->setFingerPrint(fingerprint);
+  // // Or, if you happy to ignore the SSL certificate, then use the following line instead:
+  // client->setInsecure();
+  // long preConnectTime = millis();
+  // WiFi.begin(config.ssid, config.password);
+  // DEBUG_PRINT("Connecting to "); DEBUG_PRINT(config.ssid);
+  // while (WiFi.status() != WL_CONNECTED)
+  // {
+  //   DEBUG_PRINT(".");
+  //   if (millis() - preConnectTime > MAX_WIFI_CONNECT_TIME) {
+  //     DEBUG_PRINTLN("WiFi failed to connect within power budget");
+  //     DEBUG_PRINTLN("Deep sleeping...");
+  //     ESP.deepSleep(DEEPSLEEP_TIME);
+  //   }
+  //   delay(500);
+  // }
+  // long postConnectTime = millis();
+  // DEBUG_PRINTLN();
+
+  // DEBUG_PRINT("Connected, IP address: ");
+  // DEBUG_PRINTLN(WiFi.localIP());
 
 
-  // =================================================
-  // BME280
-  // =================================================
-  DynamicJsonDocument data(128);
-  data["wifiConnecTime_ms"] = postConnectTime - preConnectTime;
-  data["Vcc"] = analogRead(BATTERY_VCC_PIN);
-  data["git_rev"] = GIT_REV;
-  bmeSensorJson(data);
-  String jsonData;
-  serializeJson(data, jsonData);
+  // // =================================================
+  // // BME280
+  // // =================================================
+  // DynamicJsonDocument data(128);
+  // data["wifiConnecTime_ms"] = postConnectTime - preConnectTime;
+  // data["Vcc"] = analogRead(BATTERY_VCC_PIN);
+  // data["git_rev"] = GIT_REV;
+  // bmeSensorJson(data);
+  // String jsonData;
+  // serializeJson(data, jsonData);
 
-  DEBUG_PRINTLN(jsonData);
-  long preHttpCallTime = millis();
-  String postResult = postData(*client, http, config.url, jsonData.c_str());
-  DEBUG_PRINTLN(postResult);
-  long postHttpCallTime = millis();
+  // DEBUG_PRINTLN(jsonData);
+  // long preHttpCallTime = millis();
+  // String postResult = postData(*client, http, config.url, jsonData.c_str());
+  // DEBUG_PRINTLN(postResult);
+  // long postHttpCallTime = millis();
 
-  DEBUG_PRINT("Wifi connect time: "); DEBUG_PRINT(postConnectTime - preConnectTime); DEBUG_PRINTLN("ms");
-  DEBUG_PRINT("Http call time: "); DEBUG_PRINT(postHttpCallTime - preHttpCallTime); DEBUG_PRINTLN("ms");
-  DEBUG_PRINT("Total time:"); DEBUG_PRINT(postHttpCallTime - start); DEBUG_PRINTLN("ms");
+  // DEBUG_PRINT("Wifi connect time: "); DEBUG_PRINT(postConnectTime - preConnectTime); DEBUG_PRINTLN("ms");
+  // DEBUG_PRINT("Http call time: "); DEBUG_PRINT(postHttpCallTime - preHttpCallTime); DEBUG_PRINTLN("ms");
+  // DEBUG_PRINT("Total time:"); DEBUG_PRINT(postHttpCallTime - start); DEBUG_PRINTLN("ms");
 
-  DEBUG_PRINTLN("Deep sleeping...");
-  ESP.deepSleep(DEEPSLEEP_TIME);
+  // DEBUG_PRINTLN("Deep sleeping...");
+  // ESP.deepSleep(DEEPSLEEP_TIME);
 }
 
 void loop() {}
