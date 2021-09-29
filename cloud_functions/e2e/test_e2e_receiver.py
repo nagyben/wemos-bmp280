@@ -6,7 +6,7 @@ from google.cloud import firestore
 RECEIVER_URL = os.getenv("RECEIVER_URL")
 GOOGLE_PROJECT = os.getenv("GOOGLE_PROJECT")
 
-COLLECTION = "weather"
+COLLECTION = "test_weather"
 
 
 def delete_documents(db: firestore.Client):
