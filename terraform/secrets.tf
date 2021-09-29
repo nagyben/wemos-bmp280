@@ -1,21 +1,13 @@
-resource "random_password" "shared_secret" {
-  length = 16
-
-  keepers = {
-    version = 1
-  }
-}
-
-resource "google_secret_manager_secret" "api_key" {
-  secret_id = "api-key"
+resource "google_secret_manager_secret" "esp8266_pk" {
+  secret_id = "esp8266-pk"
 
   replication {
     automatic = true
   }
 }
 
-resource "google_secret_manager_secret_version" "api_key_version" {
-  secret = google_secret_manager_secret.api_key.id
+resource "google_secret_manager_secret_version" "esp8266_pk_version" {
+  secret = google_secret_manager_secret.esp8266_pk.id
 
-  secret_data = random_password.shared_secret.result
+  secret_data = google_service_account_key.esp8266_key.private_key
 }
