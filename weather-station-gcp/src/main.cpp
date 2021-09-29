@@ -45,8 +45,7 @@ IPAddress subnet( 255, 255, 255, 0 );
 
 void setup() {
   WiFi.forceSleepBegin();
-  yield(); // IMPORTANT! This line allows the ESP to switch of the radio
-
+  delay(1);
   long start = millis();
   // =================================================
   // Serial

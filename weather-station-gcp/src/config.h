@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <LittleFS.h>
 
 #ifndef DEBUG_PRINT
   #define DEBUG_PRINT(x)
