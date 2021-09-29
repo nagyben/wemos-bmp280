@@ -41,6 +41,7 @@ void bmeSensorJson(DynamicJsonDocument &d);
 
 void setup() {
   WiFi.forceSleepBegin();
+  delay(1);
   long start = millis();
   // =================================================
   // Serial
@@ -48,12 +49,17 @@ void setup() {
 #ifdef DEBUG
   Serial.begin(115200);
 #endif
-
+  DEBUG_PRINTLN();
+  DEBUG_PRINTLN();
+  DEBUG_PRINTLN();
+  DEBUG_PRINTLN("=======================================");
   DEBUG_PRINTLN("Code version "); DEBUG_PRINTLN(GIT_REV);
-  const unsigned char payload[] = "hello";
-  char output[500];
-  getJWT(payload, output);
-
+  const unsigned char payload[] = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0";
+  char output[1024];
+  signPayload_rs256_base64(payload, (unsigned char*) output);
+  Serial.println("test");
+  delay(0);
+  DEBUG_PRINTLN("herp");
   DEBUG_PRINTLN(output);
 
   // // =================================================

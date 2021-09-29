@@ -16,33 +16,34 @@
 
 // DO NOT COMMIT THIS
 const char PEMKEY[] = R"EOF(
------BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEAyY/Wf9evR3QCDt4c6t91zFV1NBBql0nzHf5QvAqcctJ7KfA2
-UQRY/Ld9pv6jT50yUCrIVFHDUyrKgJ+MDkSGdj2jP8mq7ZBLFnLITDpLKSBtNBOp
-M0SZi5vz3Ed2yloerOG4F3aa2lBxW4PhQ6O2v2dCx4hwpZSNWEJimLx5wdlv7VWn
-0YfYoCoLmfIHqTV6OWkxH8PSQZOqUoT+Rxg/+gYaMS1xl8foMA411wiZXJetA6hI
-+Ph2zS46yhN2Y5DmybT+C/o8u+Mixe98B21ahLVUdeXy+vXo5DdgVcR5tKloqM1L
-6n25xYuCSBsfRroayX49a76bF4slSF66Ykl3owIDAQABAoIBAAqPuOOV/5802u7A
-gK9l6hw81hlWSt+GhnCp5L0VqUDy+nUmGxJ/sdH8I19etFv1lq9QrpKMfjmbYmT+
-9y3ANXN4o1cyT/yGtQiGFyy3WTzccBxsc082Zv1DvLFsJTNRKY5RfX3tPwv1bxsm
-e+U5bNf2py8hXRWwBP/86oGqTo7zp+29phKWf/WiqJc7xmsReiSxkWHY31bMt2PY
-14sJoRsq6CbSAOtFM1Wog/6r9BK+UfDatNpBeUFtQXySIWKbEy96FTWVMqXe+or0
-dyXKP1WNIk7TYfpy4hAHFUnj64lMq2e+QToOyXIGcG2ZJvfoGUpkbVG24pB7S0ad
-x9pAgqECgYEA7veqzh1FUaFgaH741TWk4x+1MeIkaejgEglr6Qu0gyrnFWrvIxT6
-xNpAkYj7ns94hbLc+vZeEvzHrW6NQpbxCmMizkSlM6SpWuKton5iatxA2/Yr/lpf
-HKD/LrvYE+yNfNPaXoh0W0tpTw5Uomko9+f8TMIA6HLIA+Y00sw78ukCgYEA1+2l
-y4Wy5+X9zeeB8fqBcOs0z7joOkzFBm0ph3MQh9Hz+vRNiLaHduoqjiZlCieOoJfd
-hDW4GMBCjTip/SzCBRAmMGZjexII/sKtydxu5YjPuo1ROrcwCCG8fnZ/TRb3VwCC
-u9v/RHk/Y630EbwW77Qz+9W1oDPn+bryZ86uxqsCgYEAhcaACAK624fLwLPT+Qee
-1sbZWKOQXvnO9knv7vZuhz9tPcAvPyRvfePwYYid07mxbqdCrftdjqOT5LMOwUhe
-h8IXqgEjulVjuU1MhrrZvZivdnPJDQrqU8yNDkx6Gi1Cx66RgHpDKRh+S5NqLcFQ
-/fcQdqfkejxHXGdzCs7qgIECgYBLlOff4aDKA3tfw5V8ug7tE6ecvkCrh4u/wB41
-R1WV9SvNwA4TuLCaM0VKFK5xa39FP2NOj+8s2r9w51C5Sh1v4EM91dkkjx+O7V4f
-toUq20S7LBQu1Uh+0DBGo/vTZCKX1ZntYAhuU3KY1Z8FRi1RIma/1AKLXR/qDkIj
-i/kpmQKBgQDd1uPrvAB/+X5T6piwXiqEauxyDiPal5b4zAy5Ho8X9csJ3OdfKQVE
-z9RLh+Jnut+Ahk9C5/UpcXkBVyR2oyAW8FhL9grK8JgYhAoBVhRuVy60F4c6ooku
-6OiO6mxXR36OcPvHIHq7sG6Nav3fNOq2kQa+HcrP5NL5iaRILyHrKg==
------END RSA PRIVATE KEY-----
+-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC7VJTUt9Us8cKj
+MzEfYyjiWA4R4/M2bS1GB4t7NXp98C3SC6dVMvDuictGeurT8jNbvJZHtCSuYEvu
+NMoSfm76oqFvAp8Gy0iz5sxjZmSnXyCdPEovGhLa0VzMaQ8s+CLOyS56YyCFGeJZ
+qgtzJ6GR3eqoYSW9b9UMvkBpZODSctWSNGj3P7jRFDO5VoTwCQAWbFnOjDfH5Ulg
+p2PKSQnSJP3AJLQNFNe7br1XbrhV//eO+t51mIpGSDCUv3E0DDFcWDTH9cXDTTlR
+ZVEiR2BwpZOOkE/Z0/BVnhZYL71oZV34bKfWjQIt6V/isSMahdsAASACp4ZTGtwi
+VuNd9tybAgMBAAECggEBAKTmjaS6tkK8BlPXClTQ2vpz/N6uxDeS35mXpqasqskV
+laAidgg/sWqpjXDbXr93otIMLlWsM+X0CqMDgSXKejLS2jx4GDjI1ZTXg++0AMJ8
+sJ74pWzVDOfmCEQ/7wXs3+cbnXhKriO8Z036q92Qc1+N87SI38nkGa0ABH9CN83H
+mQqt4fB7UdHzuIRe/me2PGhIq5ZBzj6h3BpoPGzEP+x3l9YmK8t/1cN0pqI+dQwY
+dgfGjackLu/2qH80MCF7IyQaseZUOJyKrCLtSD/Iixv/hzDEUPfOCjFDgTpzf3cw
+ta8+oE4wHCo1iI1/4TlPkwmXx4qSXtmw4aQPz7IDQvECgYEA8KNThCO2gsC2I9PQ
+DM/8Cw0O983WCDY+oi+7JPiNAJwv5DYBqEZB1QYdj06YD16XlC/HAZMsMku1na2T
+N0driwenQQWzoev3g2S7gRDoS/FCJSI3jJ+kjgtaA7Qmzlgk1TxODN+G1H91HW7t
+0l7VnL27IWyYo2qRRK3jzxqUiPUCgYEAx0oQs2reBQGMVZnApD1jeq7n4MvNLcPv
+t8b/eU9iUv6Y4Mj0Suo/AU8lYZXm8ubbqAlwz2VSVunD2tOplHyMUrtCtObAfVDU
+AhCndKaA9gApgfb3xw1IKbuQ1u4IF1FJl3VtumfQn//LiH1B3rXhcdyo3/vIttEk
+48RakUKClU8CgYEAzV7W3COOlDDcQd935DdtKBFRAPRPAlspQUnzMi5eSHMD/ISL
+DY5IiQHbIH83D4bvXq0X7qQoSBSNP7Dvv3HYuqMhf0DaegrlBuJllFVVq9qPVRnK
+xt1Il2HgxOBvbhOT+9in1BzA+YJ99UzC85O0Qz06A+CmtHEy4aZ2kj5hHjECgYEA
+mNS4+A8Fkss8Js1RieK2LniBxMgmYml3pfVLKGnzmng7H2+cwPLhPIzIuwytXywh
+2bzbsYEfYx3EoEVgMEpPhoarQnYPukrJO4gwE2o5Te6T5mJSZGlQJQj9q4ZB2Dfz
+et6INsK0oG8XVGXSpQvQh3RUYekCZQkBBFcpqWpbIEsCgYAnM3DQf3FJoSnXaMhr
+VBIovic5l0xFkEHskAjFTevO86Fsz1C2aSeRKSqGFoOQ0tmJzBEs1R6KqnHInicD
+TQrKhArgLXX4v3CddjfTRJkFWDbE/CkvKZNOrcf1nhaGCPspRJj2KUkj1Fhl9Cnc
+dn/RsYEONbwQSjIfMPkvxF+8HQ==
+-----END PRIVATE KEY-----
 )EOF";
 
 String postData(WiFiClient &client, HTTPClient &http, const char* url, const char* data)
@@ -74,13 +75,49 @@ String postData(WiFiClient &client, HTTPClient &http, const char* url, const cha
   return payload;
 }
 
-void getJWT(const unsigned char* payload, char* base64Output) {
+void signPayload_rs256_base64(const unsigned char*, unsigned char*);
+void base64UrlEncode(unsigned char*, uint16_t, unsigned char*);
+
+void signPayload_rs256_base64(const unsigned char* payload, unsigned char* base64Output) {
+  br_sha256_context* ctx = new br_sha256_context;
+  unsigned char sha256[256/8]; // stores sha256 of payload
+  unsigned char rsa256Signature[2048/8];
   BearSSL::PrivateKey *private_key;
   private_key = new BearSSL::PrivateKey(PEMKEY);
-  unsigned char output[500];
-  br_rsa_pkcs1_sign signature = br_rsa_pkcs1_sign_get_default();
-  signature(BR_HASH_OID_SHA256, payload, sizeof(payload), private_key->getRSA(), output);
-  encode_base64(output, sizeof(output), (unsigned char*) base64Output);
+
+  br_rsa_pkcs1_sign rsa256Sign = br_rsa_pkcs1_sign_get_default();
+
+  br_sha256_init(ctx);
+  br_sha256_update(ctx, payload, strlen((char*)payload));
+  br_sha256_out(ctx, sha256); // calculate sha256
+
+  ESP.wdtDisable(); // disable watchdog for this part because it takes longer than the timeout
+
+  // get signature of sha256 hashed payload
+  rsa256Sign(BR_HASH_OID_SHA256, sha256, sizeof(sha256), private_key->getRSA(), rsa256Signature);
+
+  ESP.wdtEnable(3000); // re-enable watchdog timer
+
+  // encode_base64(rsa256Signature, sizeof(rsa256Signature), base64Output);
+  base64UrlEncode(rsa256Signature, sizeof(rsa256Signature), base64Output);
+}
+
+void base64UrlEncode(unsigned char* input, uint16_t inputLength, unsigned char* output) {
+  unsigned int b64Length = encode_base64(input, inputLength, output);
+  for (int i = 0; i < b64Length; i++) {
+    if (output[i] == '/') {
+      output[i] = '_';
+      continue;
+    }
+    if (output[i] == '+') {
+      output[i] = '-';
+      continue;
+    }
+    if (output[i] == '=') {
+      output[i] = '\0';
+      break;
+    }
+  }
 }
 
 #endif
