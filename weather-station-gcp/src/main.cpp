@@ -88,7 +88,7 @@ void setup() {
     if (millis() - preConnectTime > MAX_WIFI_CONNECT_TIME) {
       DEBUG_PRINTLN("WiFi failed to connect within power budget");
       DEBUG_PRINTLN("Deep sleeping...");
-      ESP.deepSleep(DEEPSLEEP_TIME);
+      ESP.deepSleep(DEEPSLEEP_TIME, WAKE_RF_DISABLED);
     }
     delay(500);
   }
@@ -126,10 +126,9 @@ void setup() {
 
   WiFi.disconnect( true );
   delay( 1 );
-  // WAKE_RF_DISABLED to keep the WiFi radio disabled when we wake up
-  ESP.deepSleep( SLEEPTIME, WAKE_RF_DISABLED );
   DEBUG_PRINTLN("Deep sleeping...");
-  ESP.deepSleep(DEEPSLEEP_TIME);
+  // WAKE_RF_DISABLED to keep the WiFi radio disabled when we wake up
+  ESP.deepSleep(DEEPSLEEP_TIME, WAKE_RF_DISABLED );
 }
 
 void loop() {}
