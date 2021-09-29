@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
@@ -7,7 +8,7 @@
 #include <SPI.h>
 #include <Adafruit_BME280.h>
 
-// #define DEBUG
+#define DEBUG
 #ifdef DEBUG
   #define DEBUG_PRINT(x)  Serial.print (x)
   #define DEBUG_PRINTLN(x)  Serial.println (x)
@@ -43,16 +44,51 @@ IPAddress ip( 192, 168, 1, 132 );
 IPAddress gateway( 192, 168, 1, 1 );
 IPAddress subnet( 255, 255, 255, 0 );
 
+void initWiFi(Config &config, int timeout = MAX_WIFI_CONNECT_TIME) {
+  WiFi.forceSleepWake();
+  yield(); // IMPORTANT!
+  WiFi.persistent( false ); // Disable the WiFi persistence.  The ESP8266 will not load and save WiFi settings in the flash memory.
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(config.ssid, config.password);
+  DEBUG_PRINT("Connecting to WiFi ..");
+  long start = millis();
+  while (WiFi.status() != WL_CONNECTED) {
+    DEBUG_PRINT('.');
+    delay(500);
+    if (millis() - start > timeout) {
+      DEBUG_PRINTLN("WiFi failed to connect within power budget");
+      DEBUG_PRINTLN("Deep sleeping...");
+      ESP.deepSleep(DEEPSLEEP_TIME, WAKE_RF_DISABLED);
+    }
+  }
+  DEBUG_PRINT("Connected, IP address: "); DEBUG_PRINTLN(WiFi.localIP());
+}
+
+void wifiDisconnect(void) {
+    // Disconnecting wifi
+    DEBUG_PRINT(F("Disconnecting client"));
+    client->stop();
+
+    DEBUG_PRINT(F(", wifi"));
+    WiFi.disconnect();
+    WiFi.mode(WIFI_OFF);
+    delay(100);  // FIXME
+
+    DEBUG_PRINTLN(F(", sleeping"));
+    WiFi.forceSleepBegin();  // turn off ESP8266 RF
+    delay(100);  // FIXME
+}
+
 void setup() {
   WiFi.forceSleepBegin();
-  yield(); // IMPORTANT! This line allows the ESP to switch of the radio
-
+  delay(1);
   long start = millis();
   // =================================================
   // Serial
   // =================================================
 #ifdef DEBUG
   Serial.begin(115200);
+  delay(500);
 #endif
 
   DEBUG_PRINT("Code version "); DEBUG_PRINTLN(GIT_REV);
@@ -65,6 +101,7 @@ void setup() {
     DEBUG_PRINTLN("Could not mount filesystem!");
   }
   loadConfiguration(filename, config);
+  String privateKey = loadPrivateKey();
   LittleFS.end();
 
   if (!isConfigValid(config)) {
@@ -74,31 +111,9 @@ void setup() {
   // =================================================
   // Wifi Client
   // =================================================
-  WiFi.forceSleepWake();
-  yield(); // IMPORTANT!
-
-  WiFi.persistent( false ); // Disable the WiFi persistence.  The ESP8266 will not load and save WiFi settings in the flash memory.
-
-  WiFi.mode(WIFI_STA);
   long preConnectTime = millis();
-  WiFi.begin(config.ssid, config.password);
-  DEBUG_PRINT("Connecting to "); DEBUG_PRINT(config.ssid);
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    DEBUG_PRINT(".");
-    if (millis() - preConnectTime > MAX_WIFI_CONNECT_TIME) {
-      DEBUG_PRINTLN("WiFi failed to connect within power budget");
-      DEBUG_PRINTLN("Deep sleeping...");
-      ESP.deepSleep(DEEPSLEEP_TIME);
-    }
-    delay(500);
-  }
+  initWiFi(config);
   long postConnectTime = millis();
-  DEBUG_PRINTLN();
-
-  DEBUG_PRINT("Connected, IP address: ");
-  DEBUG_PRINTLN(WiFi.localIP());
-
 
   // =================================================
   // BME280
@@ -110,26 +125,28 @@ void setup() {
   bmeSensorJson(data);
   String jsonData;
   serializeJson(data, jsonData);
-
   DEBUG_PRINTLN(jsonData);
+
   long preHttpCallTime = millis();
   client = new BearSSL::WiFiClientSecure;
   // client->setFingerPrint(fingerprint);
   // Or, if you happy to ignore the SSL certificate, then use the following line instead:
   client->setInsecure();
-  String postResult = postData(*client, http, config.url, jsonData.c_str());
+  String gcpIdToken = getGcpToken(*client, http, config, privateKey.c_str());
+  DEBUG_PRINTLN(gcpIdToken);
+
+  String postResult = postData(*client, http, config.url, jsonData.c_str(), gcpIdToken);
   DEBUG_PRINTLN(postResult);
-  long postHttpCallTime = millis();
+  // long postHttpCallTime = millis();
 
-  DEBUG_PRINT("Wifi connect time: "); DEBUG_PRINT(postConnectTime - preConnectTime); DEBUG_PRINTLN("ms");
-  DEBUG_PRINT("Http call time: "); DEBUG_PRINT(postHttpCallTime - preHttpCallTime); DEBUG_PRINTLN("ms");
-  DEBUG_PRINT("Total time:"); DEBUG_PRINT(postHttpCallTime - start); DEBUG_PRINTLN("ms");
+  // DEBUG_PRINT("Wifi connect time: "); DEBUG_PRINT(postConnectTime - preConnectTime); DEBUG_PRINTLN("ms");
+  // DEBUG_PRINT("Http call time: "); DEBUG_PRINT(postHttpCallTime - preHttpCallTime); DEBUG_PRINTLN("ms");
+  // DEBUG_PRINT("Total time:"); DEBUG_PRINT(postHttpCallTime - start); DEBUG_PRINTLN("ms");
 
-  WiFi.disconnect( true );
-  delay( 1 );
+  wifiDisconnect();
+  DEBUG_PRINTLN(F("Deep sleeping..."));
   // WAKE_RF_DISABLED to keep the WiFi radio disabled when we wake up
-  ESP.deepSleep( SLEEPTIME, WAKE_RF_DISABLED );
-  DEBUG_PRINTLN("Deep sleeping...");
+  ESP.deepSleep(DEEPSLEEP_TIME, WAKE_RF_DISABLED );
   ESP.deepSleep(DEEPSLEEP_TIME);
 }
 
@@ -154,3 +171,4 @@ void bmeSensorJson(DynamicJsonDocument &data) {
   data["humidity_%"] = bme.readHumidity();
   digitalWrite(BME_VCC_PIN, LOW);
 }
+
