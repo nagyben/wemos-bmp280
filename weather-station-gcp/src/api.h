@@ -158,7 +158,6 @@ String getGcpToken(WiFiClient &client, HTTPClient &http, Config &config, const c
   http.begin(client, GCP_AUTH_URL);
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
   http.addHeader("Authorization", authHeader);
-  DEBUG_PRINT("n. of http headers: "); DEBUG_PRINTLN(http.headers());
 
   char body[1000];
   strcat(body, "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=");
