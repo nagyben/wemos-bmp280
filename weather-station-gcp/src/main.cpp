@@ -147,7 +147,6 @@ void setup() {
   DEBUG_PRINTLN(F("Deep sleeping..."));
   // WAKE_RF_DISABLED to keep the WiFi radio disabled when we wake up
   ESP.deepSleep(DEEPSLEEP_TIME, WAKE_RF_DISABLED );
-  ESP.deepSleep(DEEPSLEEP_TIME);
 }
 
 void loop() {}
