@@ -63,18 +63,12 @@ void test_getJwt(void) {
     TEST_ASSERT_EQUAL_STRING(expected, actual);
 }
 
-void test_getGcpToken(void) {
-    LittleFS.begin();
-    Config config;
-    HTTPClient http;
-    BearSSL::WiFiClientSecure *client;
-    loadConfiguration("config.json", config);
-    client = new BearSSL::WiFiClientSecure;
-    client->setInsecure();
-    String privateKey = loadPrivateKey();
-    String result = getGcpToken(*client, http, config, privateKey.c_str());
-    const char expected[] = "OK";
-    TEST_ASSERT_EQUAL_STRING(expected, result.c_str());
+void test_unpackIdTokenFromGcpResponse(void) {
+    String gcpResponse = "{\"id_token\":\"eyJhbGciOiJSUzI1NiIsImtpZCI6IjhkOTI5YzYzZmYxMDgyYmJiOGM5OWY5OTRmYTNmZjRhZGFkYTJkMTEiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJodHRwczovL2V1cm9wZS13ZXN0Mi1uYWd5YmVuLmNsb3VkZnVuY3Rpb25zLm5ldC9yZWNlaXZlciIsImF6cCI6ImVzcDgyNjYtc2FAbmFneWJlbi5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsImVtYWlsIjoiZXNwODI2Ni1zYUBuYWd5YmVuLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImV4cCI6MTYzMzE4NzY3OCwiaWF0IjoxNjMzMTg0MDc4LCJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJzdWIiOiIxMTIxMTQ1MzAyMDYzMjI0NTUxMjYifQ.zMDMRJQUuursfdIPglhu676U8Uyswj0IZTSh_jCLFHUCQ_s0N1Py83VIn14qxNLLhazdRfrdRLZc8eB6CFguDGcUxJjwaqN2N0b71ucGfCI0ySOvDt_UnSY5YjDkE9etV1cELpmFuUZ2FFVCIMhf4WFMgfcXz4WAfCGNUe11yvRvZ573Z5uHZyCagDbJEpGNm2ym1AW9TURb5Ez1uImyDu7JTgnxfgIlPJtopJs0fjSw55EPpn5DHbkmlyxYd6oMjS7RUeCpv-NJ16W04caTGGUmAb6M3ePwBfBfloTNbiJ1CdrLwm96046cwUsmch9JwNmzSJpCG-od6aTMh3Kfsg\"}";
+    String expected = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjhkOTI5YzYzZmYxMDgyYmJiOGM5OWY5OTRmYTNmZjRhZGFkYTJkMTEiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJodHRwczovL2V1cm9wZS13ZXN0Mi1uYWd5YmVuLmNsb3VkZnVuY3Rpb25zLm5ldC9yZWNlaXZlciIsImF6cCI6ImVzcDgyNjYtc2FAbmFneWJlbi5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsImVtYWlsIjoiZXNwODI2Ni1zYUBuYWd5YmVuLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImV4cCI6MTYzMzE4NzY3OCwiaWF0IjoxNjMzMTg0MDc4LCJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJzdWIiOiIxMTIxMTQ1MzAyMDYzMjI0NTUxMjYifQ.zMDMRJQUuursfdIPglhu676U8Uyswj0IZTSh_jCLFHUCQ_s0N1Py83VIn14qxNLLhazdRfrdRLZc8eB6CFguDGcUxJjwaqN2N0b71ucGfCI0ySOvDt_UnSY5YjDkE9etV1cELpmFuUZ2FFVCIMhf4WFMgfcXz4WAfCGNUe11yvRvZ573Z5uHZyCagDbJEpGNm2ym1AW9TURb5Ez1uImyDu7JTgnxfgIlPJtopJs0fjSw55EPpn5DHbkmlyxYd6oMjS7RUeCpv-NJ16W04caTGGUmAb6M3ePwBfBfloTNbiJ1CdrLwm96046cwUsmch9JwNmzSJpCG-od6aTMh3Kfsg";
+    auto actual = _unpackIdTokenFromGcpResponse(gcpResponse);
+
+    TEST_ASSERT_EQUAL_STRING(expected.c_str(), actual.c_str());
 }
 
 void setup() {
@@ -82,6 +76,7 @@ void setup() {
     UNITY_BEGIN();
     RUN_TEST(test_signature);
     RUN_TEST(test_getJwt);
+    RUN_TEST(test_unpackIdTokenFromGcpResponse);
     UNITY_END();
 }
 

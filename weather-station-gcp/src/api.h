@@ -20,11 +20,14 @@
 
 #define RS256_JWT_HEADER "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9"
 #define GCP_AUTH_URL "https://www.googleapis.com/oauth2/v4/token"
+// #define GCP_AUTH_URL "https://192.168.1.47:5000"
 
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "pool.ntp.org");
+#define HEAP DEBUG_PRINTLN(ESP.getFreeHeap())
+#define STACK DEBUG_PRINTLN(ESP.getFreeContStack())
 
 unsigned long getTime() {
+  WiFiUDP ntpUDP;
+  NTPClient timeClient(ntpUDP, "pool.ntp.org");
   timeClient.begin();
   unsigned long now;
   do {
@@ -42,6 +45,7 @@ String postData(WiFiClient &client, HTTPClient &http, const char* url, const cha
 
   http.begin(client, url);
   http.addHeader("Content-Type", "application/json");
+
 
   char buffer[512];
   sprintf(buffer, "Making request to %s with data %s", url, data);
@@ -68,6 +72,8 @@ String postData(WiFiClient &client, HTTPClient &http, const char* url, const cha
 void signPayload_rs256_base64(const unsigned char* payload, const char* privateKey, unsigned char* rsa256Signature_base64);
 void base64UrlEncode(unsigned char* input, uint16_t inputLength, unsigned char*);
 void getJWT(const char* payload, uint16_t payloadLength, const char* privateKey, char* jwt);
+String getGcpToken(WiFiClient &client, HTTPClient &http, Config &config, const char* privateKey);
+String _unpackIdTokenFromGcpResponse(String &response);
 
 inline void signPayload_rs256_base64(const unsigned char* payload, const char* privateKey, unsigned char* rsa256Signature_base64) {
   br_sha256_context* ctx = new br_sha256_context;
@@ -87,7 +93,6 @@ inline void signPayload_rs256_base64(const unsigned char* payload, const char* p
   // get signature of sha256 hashed payload
   DEBUG_PRINTLN(F("Generating RSA256 signature..."));
   rsa256Sign(BR_HASH_OID_SHA256, sha256, sizeof(sha256), pKey->getRSA(), rsa256Signature);
-
   ESP.wdtEnable(3000); // re-enable watchdog timer
 
   DEBUG_PRINTLN(F("Encoding signature into base64..."));
@@ -119,22 +124,22 @@ inline void getJWT(const char* payload, uint16_t payloadLength, const char* priv
   strcat(jwt, ".");
 
   DEBUG_PRINT("payload: "); DEBUG_PRINTLN(payload);
-  unsigned char encodedPayload[1024];
-  base64UrlEncode((unsigned char*) payload, payloadLength, encodedPayload);
-  strcat(jwt, (char*) encodedPayload);
+  auto encodedPayload = std::make_unique<unsigned char[]>(1024);
+  base64UrlEncode((unsigned char*) payload, payloadLength, encodedPayload.get());
+  strcat(jwt, (char*) encodedPayload.get());
 
-  char rsa256Signature_base64[1024];
-  signPayload_rs256_base64((unsigned char*) jwt, privateKey, (unsigned char*) rsa256Signature_base64);
+  auto rsa256Signature_base64 = std::make_unique<unsigned char[]>(1024);
+  signPayload_rs256_base64((unsigned char*) jwt, privateKey, (unsigned char*) rsa256Signature_base64.get());
 
   strcat(jwt, ".");
-  strcat(jwt, rsa256Signature_base64);
+  strcat(jwt, (char*) rsa256Signature_base64.get());
 }
 
 String getGcpToken(WiFiClient &client, HTTPClient &http, Config &config, const char* privateKey) {
   // see https://cloud.google.com/functions/docs/securing/authenticating
   DEBUG_PRINTLN(F("Generating JWT token for GCP auth..."));
   const unsigned long curtime = getTime();
-  DynamicJsonDocument payload(256);
+  DynamicJsonDocument payload(512);
   payload["target_audience"] = config.url;
   payload["iss"] = config.saEmail;
   payload["sub"] = config.saEmail;
@@ -144,28 +149,26 @@ String getGcpToken(WiFiClient &client, HTTPClient &http, Config &config, const c
 
   String jsonData;
   serializeJson(payload, jsonData);
-  DEBUG_PRINTLN(jsonData.c_str());
+  DEBUG_PRINTLN(jsonData);
 
-  char jwt[1200];
-  getJWT(jsonData.c_str(), jsonData.length(), privateKey, jwt);
-  DEBUG_PRINT(F("JWT: ")); DEBUG_PRINTLN(jwt);
+  auto jwt = std::make_unique<char[]>(1024);
+  getJWT(jsonData.c_str(), jsonData.length(), privateKey, jwt.get());
+  DEBUG_PRINT(strlen(jwt.get())); DEBUG_PRINT(F(" JWT: ")); DEBUG_PRINTLN(jwt.get());
 
-  char authHeader[1200];
-  strcpy(authHeader, "Bearer ");
-  strcat(authHeader, jwt);
-  DEBUG_PRINT(F("authHeader: ")); DEBUG_PRINTLN(authHeader);
+  auto authHeader = std::make_unique<char[]>(1024);
+  strcpy(authHeader.get(), "Bearer ");
+  strcat(authHeader.get(), jwt.get());
+  DEBUG_PRINT(strlen(authHeader.get())); DEBUG_PRINT(F(" authHeader: ")); DEBUG_PRINTLN(authHeader.get());
 
   http.begin(client, GCP_AUTH_URL);
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-  http.addHeader("Authorization", authHeader);
+  http.addHeader("Authorization", authHeader.get());
 
-  char body[1000];
-  strcat(body, "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=");
-  strcat(body, jwt);
-  char buffer[1000];
-  sprintf(buffer, "Making request to %s with data %s", GCP_AUTH_URL, body);
-  DEBUG_PRINTLN(buffer);
-  int httpStatusCode = http.POST(body);
+  auto body = std::make_unique<char[]>(1024);
+  strcat(body.get(), "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=");
+  strcat(body.get(), jwt.get());
+  DEBUG_PRINT(strlen(authHeader.get())); DEBUG_PRINTLN(body.get());
+  int httpStatusCode = http.POST(body.get());
 
   String returnValue;
   if (httpStatusCode > 0)
@@ -184,6 +187,10 @@ String getGcpToken(WiFiClient &client, HTTPClient &http, Config &config, const c
   http.end();
 
   return returnValue;
+}
+
+String _unpackIdTokenFromGcpResponse(String &response) {
+  return response.substring(13, response.length()-2);
 }
 
 #endif

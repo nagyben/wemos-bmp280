@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
@@ -63,6 +64,21 @@ void initWiFi(Config &config, int timeout = MAX_WIFI_CONNECT_TIME) {
   DEBUG_PRINT("Connected, IP address: "); DEBUG_PRINTLN(WiFi.localIP());
 }
 
+void wifiDisconnect(void) {
+    // Disconnecting wifi
+    DEBUG_PRINT(F("Disconnecting client"));
+    client->stop();
+
+    DEBUG_PRINT(F(", wifi"));
+    WiFi.disconnect();
+    WiFi.mode(WIFI_OFF);
+    delay(100);  // FIXME
+
+    DEBUG_PRINTLN(F(", sleeping"));
+    WiFi.forceSleepBegin();  // turn off ESP8266 RF
+    delay(100);  // FIXME
+}
+
 void setup() {
   WiFi.forceSleepBegin();
   delay(1);
@@ -117,19 +133,20 @@ void setup() {
   // Or, if you happy to ignore the SSL certificate, then use the following line instead:
   client->setInsecure();
   String result = getGcpToken(*client, http, config, privateKey.c_str());
+  DynamicJsonDocument gcpResponse(1024);
   // String postResult = postData(*client, http, config.url, jsonData.c_str());
   DEBUG_PRINTLN(result);
-  long postHttpCallTime = millis();
+  // long postHttpCallTime = millis();
 
-  DEBUG_PRINT("Wifi connect time: "); DEBUG_PRINT(postConnectTime - preConnectTime); DEBUG_PRINTLN("ms");
-  DEBUG_PRINT("Http call time: "); DEBUG_PRINT(postHttpCallTime - preHttpCallTime); DEBUG_PRINTLN("ms");
-  DEBUG_PRINT("Total time:"); DEBUG_PRINT(postHttpCallTime - start); DEBUG_PRINTLN("ms");
+  // DEBUG_PRINT("Wifi connect time: "); DEBUG_PRINT(postConnectTime - preConnectTime); DEBUG_PRINTLN("ms");
+  // DEBUG_PRINT("Http call time: "); DEBUG_PRINT(postHttpCallTime - preHttpCallTime); DEBUG_PRINTLN("ms");
+  // DEBUG_PRINT("Total time:"); DEBUG_PRINT(postHttpCallTime - start); DEBUG_PRINTLN("ms");
 
-  WiFi.disconnect( true );
-  delay( 1 );
-  DEBUG_PRINTLN("Deep sleeping...");
+  wifiDisconnect();
+  DEBUG_PRINTLN(F("Deep sleeping..."));
   // WAKE_RF_DISABLED to keep the WiFi radio disabled when we wake up
-  ESP.deepSleep(DEEPSLEEP_TIME, WAKE_RF_DISABLED );
+  // ESP.deepSleep(DEEPSLEEP_TIME, WAKE_RF_DISABLED );
+  ESP.deepSleep(DEEPSLEEP_TIME);
 }
 
 void loop() {}
@@ -153,3 +170,4 @@ void bmeSensorJson(DynamicJsonDocument &data) {
   data["humidity_%"] = bme.readHumidity();
   digitalWrite(BME_VCC_PIN, LOW);
 }
+

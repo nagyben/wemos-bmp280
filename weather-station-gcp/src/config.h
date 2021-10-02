@@ -15,10 +15,10 @@
 #define GCP_PRIVATE_KEY_FILE "esp8266_sa.pem"
 
 struct Config {
-  char ssid[128];
-  char password[128];
-  char url[128];
-  char saEmail[128];
+  char ssid[32];
+  char password[16];
+  char url[64];
+  char saEmail[64];
 };
 
 inline bool isConfigValid(Config &config) {
@@ -37,7 +37,7 @@ inline void loadConfiguration(const char *filename, Config &config) {
   // Allocate a temporary JsonDocument
   // Don't forget to change the capacity to match your requirements.
   // Use https://arduinojson.org/v6/assistant to compute the capacity.
-  StaticJsonDocument<512> doc;
+  StaticJsonDocument<256> doc;
 
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, file);
