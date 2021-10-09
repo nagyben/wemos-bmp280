@@ -116,24 +116,30 @@ void setup() {
   long postConnectTime = millis();
 
   // =================================================
+  // GCP Authentication
+  // =================================================
+  client = new BearSSL::WiFiClientSecure;
+  // client->setFingerPrint(fingerprint);
+  // Or, if you happy to ignore the SSL certificate, then use the following line instead:
+  client->setInsecure();
+  String gcpIdToken = getGcpToken(*client, http, config, privateKey.c_str());
+  long postGcpToken = millis();
+  DEBUG_PRINTLN(gcpIdToken);
+
+  // =================================================
   // BME280
   // =================================================
-  DynamicJsonDocument data(128);
-  data["wifiConnecTime_ms"] = postConnectTime - preConnectTime;
+  DynamicJsonDocument data(192);
+  data["start_ms"] = start;
+  data["preConnectTime_ms"] = preConnectTime;
+  data["postConnectTime_ms"] = postConnectTime;
+  data["postGcpToken_ms"] = postGcpToken;
   data["Vcc"] = analogRead(BATTERY_VCC_PIN);
   data["git_rev"] = GIT_REV;
   bmeSensorJson(data);
   String jsonData;
   serializeJson(data, jsonData);
   DEBUG_PRINTLN(jsonData);
-
-  long preHttpCallTime = millis();
-  client = new BearSSL::WiFiClientSecure;
-  // client->setFingerPrint(fingerprint);
-  // Or, if you happy to ignore the SSL certificate, then use the following line instead:
-  client->setInsecure();
-  String gcpIdToken = getGcpToken(*client, http, config, privateKey.c_str());
-  DEBUG_PRINTLN(gcpIdToken);
 
   String postResult = postData(*client, http, config.url, jsonData.c_str(), gcpIdToken);
   DEBUG_PRINTLN(postResult);
