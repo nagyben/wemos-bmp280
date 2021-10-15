@@ -50,7 +50,7 @@ resource "google_cloudfunctions_function" "receiver_function_authenticated" {
   source_archive_bucket = google_storage_bucket.functions_storage_bucket.name
   source_archive_object = google_storage_bucket_object.zip.name
   trigger_http          = true
-  entry_point           = "receiver_authenticated"
+  entry_point           = "receiver_function"
   max_instances         = 1
 }
 
