@@ -160,7 +160,6 @@ jobs:
 
     - name: Test with pytest
       run: |
-        cat ../terraform/tfoutput.json
         export RECEIVER_URL=$(jq -r ".receiver_url.value" ../terraform/tfoutput.json)
         pytest e2e/
       working-directory: cloud_functions
