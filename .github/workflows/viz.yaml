@@ -1,0 +1,76 @@
+name: 'viz'
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - .devcontainer/**
+      - weather-station-gcp/**
+      - .gitignore
+      - cloud_functions/**
+      - terraform/**
+
+concurrency: 'viz'
+
+jobs:
+  test:
+    name: 'Test'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 'Checkout'
+      uses: actions/checkout@v2
+
+    - name: 'install python'
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.9'
+
+    - name: 'install test dependencies'
+      run: |
+        pip install -U pip
+        pip install poetry
+        poetry lock
+        poetry install
+      env:
+        POETRY_VIRTUALENVS_CREATE: false
+      working-directory: viz
+
+    - name: 'code quality'
+      run: |
+        set -euo pipefail
+        black --check .
+        isort --check .
+      working-directory: viz
+
+    - name: 'pytest'
+      run: |
+        python -m pytest tests/
+      working-directory: viz
+
+  e2e:
+    name: e2e
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 'Checkout'
+      uses: actions/checkout@v2
+
+    - name: 'install python'
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.9'
+
+    - name: 'install e2e dependencies'
+      run: |
+        pip install -U pip
+        pip install -r requirements.txt
+      env:
+        POETRY_VIRTUALENVS_CREATE: false
+      working-directory: viz/tests
+
+    - name: 'pytest'
+      run: |
+        python -m pytest e2e/
+      working-directory: viz
