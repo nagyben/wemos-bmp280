@@ -20,28 +20,6 @@ resource "google_storage_bucket_object" "zip" {
   source = data.archive_file.data_ingestion_source.output_path
 }
 
-# Receiver function
-resource "google_cloudfunctions_function" "receiver_function" {
-  name    = "receiver"
-  runtime = "python39"
-
-  available_memory_mb   = 128
-  source_archive_bucket = google_storage_bucket.functions_storage_bucket.name
-  source_archive_object = google_storage_bucket_object.zip.name
-  trigger_http          = true
-  entry_point           = "receiver_function"
-  max_instances         = 1
-}
-
-resource "google_cloudfunctions_function_iam_member" "receiver_function_invoker" {
-  project        = google_cloudfunctions_function.receiver_function.project
-  region         = google_cloudfunctions_function.receiver_function.region
-  cloud_function = google_cloudfunctions_function.receiver_function.name
-
-  role   = "roles/cloudfunctions.invoker"
-  member = "allUsers"
-}
-
 resource "google_cloudfunctions_function" "receiver_function_authenticated" {
   name    = "receiver_authenticated"
   runtime = "python39"
