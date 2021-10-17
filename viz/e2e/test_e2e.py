@@ -1,7 +1,9 @@
 import os
+
 import requests
 
 URL = os.getenv("URL")
+
 
 def test_viz():
     response = requests.get(URL)
