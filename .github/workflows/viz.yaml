@@ -52,6 +52,7 @@ jobs:
   e2e:
     name: e2e
     runs-on: ubuntu-latest
+    needs: test
 
     steps:
     - name: 'Checkout'
