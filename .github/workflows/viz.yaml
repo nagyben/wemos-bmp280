@@ -70,7 +70,28 @@ jobs:
         POETRY_VIRTUALENVS_CREATE: false
       working-directory: viz/e2e
 
+    - name: 'install tf'
+      uses: hashicorp/setup-terraform@v1
+
+    - name: 'tf init'
+      run: terraform init
+      working-directory: terraform
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+    - name: 'tf output'
+      run: terraform-bin output -json > tfoutput.json
+      working-directory: terraform
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
     - name: 'pytest'
       run: |
+        echo $GOOGLE_CREDENTIALS > /tmp/creds.json
+        export URL=$(jq -r ".viz_url.value" ../terraform/tfoutput.json)
         python -m pytest e2e/
       working-directory: viz
+      env:
+        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_APPLICATION_CREDENTIALS: /tmp/creds.json
