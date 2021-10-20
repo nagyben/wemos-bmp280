@@ -42,6 +42,7 @@ jobs:
         set -euo pipefail
         black --check .
         isort --check .
+        mypy --strict .
       working-directory: viz
 
     - name: 'pytest'
