@@ -16,4 +16,4 @@ format:
 
 .PHONY: lint
 lint:
-	poetry run black --check . && poetry run isort --check .
+	poetry run mypy . && poetry run black --check . && poetry run isort --check .
