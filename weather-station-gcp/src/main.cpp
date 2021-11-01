@@ -53,19 +53,19 @@ void initWiFi(Config &config, int timeout = MAX_WIFI_CONNECT_TIME) {
   WiFi.persistent( false ); // Disable the WiFi persistence.  The ESP8266 will not load and save WiFi settings in the flash memory.
   WiFi.mode(WIFI_STA);
   WiFi.begin(config.ssid, config.password);
-  DEBUG_PRINT("Connecting to WiFi ..");
+  DEBUG_PRINT(F("Connecting to WiFi .."));
   long start = millis();
   while (WiFi.status() != WL_CONNECTED) {
     DEBUG_PRINT('.');
     BLINK(1);
     delay(500);
     if (millis() - start > timeout) {
-      DEBUG_PRINTLN("WiFi failed to connect within power budget");
-      DEBUG_PRINTLN("Deep sleeping...");
+      DEBUG_PRINTLN(F("WiFi failed to connect within power budget"));
+      DEBUG_PRINTLN(F("Deep sleeping..."));
       ESP.deepSleep(DEEPSLEEP_TIME, WAKE_RF_DISABLED);
     }
   }
-  DEBUG_PRINT("Connected, IP address: "); DEBUG_PRINTLN(WiFi.localIP());
+  DEBUG_PRINT(F("Connected, IP address: ")); DEBUG_PRINTLN(WiFi.localIP());
 }
 
 void wifiDisconnect(void) {
@@ -91,18 +91,19 @@ void setup() {
   // Serial
   // =================================================
 #ifdef DEBUG
+  pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   delay(500);
 #endif
 
-  DEBUG_PRINT("Code version "); DEBUG_PRINTLN(GIT_REV);
+  DEBUG_PRINT(F("Code version ")); DEBUG_PRINTLN(GIT_REV);
 
   // =================================================
   // Filesystem & load config
   // =================================================
   bool fsStatus = LittleFS.begin();
   if (!fsStatus) {
-    DEBUG_PRINTLN("Could not mount filesystem!");
+    DEBUG_PRINTLN(F("Could not mount filesystem!"));
   }
   loadConfiguration(filename, config);
   String privateKey = loadPrivateKey();
