@@ -12,9 +12,11 @@
 #ifdef DEBUG
   #define DEBUG_PRINT(x)  Serial.print (x)
   #define DEBUG_PRINTLN(x)  Serial.println (x)
+  #define BLINK(x) blink(x)
 #else
   #define DEBUG_PRINT(x)
   #define DEBUG_PRINTLN(x)
+  #define BLINK(x)
 #endif
 
 #include <config.h>
@@ -39,6 +41,7 @@ const long DEEPSLEEP_TIME = 5 * 60 * 1e6; // microseconds
 const int MAX_WIFI_CONNECT_TIME = 10 * 1e3; // milliseconds
 
 void bmeSensorJson(DynamicJsonDocument &d);
+void blink(int n);
 
 IPAddress ip( 192, 168, 1, 132 );
 IPAddress gateway( 192, 168, 1, 1 );
@@ -54,6 +57,7 @@ void initWiFi(Config &config, int timeout = MAX_WIFI_CONNECT_TIME) {
   long start = millis();
   while (WiFi.status() != WL_CONNECTED) {
     DEBUG_PRINT('.');
+    BLINK(1);
     delay(500);
     if (millis() - start > timeout) {
       DEBUG_PRINTLN("WiFi failed to connect within power budget");
@@ -143,6 +147,7 @@ void setup() {
 
   String postResult = postData(*client, http, config.url, jsonData.c_str(), gcpIdToken);
   DEBUG_PRINTLN(postResult);
+  // BLINK(3);
   // long postHttpCallTime = millis();
 
   // DEBUG_PRINT("Wifi connect time: "); DEBUG_PRINT(postConnectTime - preConnectTime); DEBUG_PRINTLN("ms");
@@ -150,6 +155,9 @@ void setup() {
   // DEBUG_PRINT("Total time:"); DEBUG_PRINT(postHttpCallTime - start); DEBUG_PRINTLN("ms");
 
   wifiDisconnect();
+#ifdef DEBUG
+  pinMode(LED_BUILTIN, INPUT_PULLUP);  // disable LED during deepsleep
+#endif
   DEBUG_PRINTLN(F("Deep sleeping..."));
   // WAKE_RF_DISABLED to keep the WiFi radio disabled when we wake up
   ESP.deepSleep(DEEPSLEEP_TIME, WAKE_RF_DISABLED );
@@ -160,6 +168,7 @@ void loop() {}
 void bmeSensorJson(DynamicJsonDocument &data) {
   pinMode(BME_VCC_PIN, OUTPUT);
   digitalWrite(BME_VCC_PIN, HIGH);
+  delay(500);
   if (!bme.begin()) {
     DEBUG_PRINTLN("Could not initialize BMP280 - check wiring!");
   }
@@ -177,3 +186,11 @@ void bmeSensorJson(DynamicJsonDocument &data) {
   digitalWrite(BME_VCC_PIN, LOW);
 }
 
+void blink(int n){
+  for(int i = 0; i < n; i++) {
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(100);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(100);
+  }
+}
