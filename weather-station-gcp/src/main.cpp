@@ -43,16 +43,19 @@ const int MAX_WIFI_CONNECT_TIME = 20 * 1e3; // milliseconds
 void bmeSensorJson(DynamicJsonDocument &d);
 void blink(int n);
 
-IPAddress ip( 192, 168, 1, 132 );
-IPAddress gateway( 192, 168, 1, 1 );
-IPAddress subnet( 255, 255, 255, 0 );
+IPAddress IP( 192, 168, 1, 132 );
+IPAddress GW( 192, 168, 1, 1 );
+IPAddress MASK( 255, 255, 255, 0 );
+const int CHANNEL = 1; // wifi channel
+const uint8_t MAC[6] = {0xB0, 0x6E, 0xBF, 0x7C, 0x0F, 0x68};
 
 void initWiFi(Config &config, int timeout = MAX_WIFI_CONNECT_TIME) {
   WiFi.forceSleepWake();
   yield(); // IMPORTANT!
   WiFi.persistent( false ); // Disable the WiFi persistence.  The ESP8266 will not load and save WiFi settings in the flash memory.
   WiFi.mode(WIFI_STA);
-  WiFi.begin(config.ssid, config.password);
+  // WiFi.begin(config.ssid, config.password);
+  WiFi.begin(config.ssid, config.password, CHANNEL, MAC, true);
   DEBUG_PRINT(F("Connecting to WiFi .."));
   long start = millis();
   while (WiFi.status() != WL_CONNECTED) {
