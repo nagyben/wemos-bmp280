@@ -61,7 +61,7 @@ void initWiFi(Config &config, int timeout = MAX_WIFI_CONNECT_TIME) {
   while (WiFi.status() != WL_CONNECTED) {
     DEBUG_PRINT('.');
     BLINK(1);
-    delay(500);
+    delay(100);
     if (millis() - start > timeout) {
       DEBUG_PRINTLN(F("WiFi failed to connect within power budget"));
       DEBUG_PRINTLN(F("Deep sleeping..."));
