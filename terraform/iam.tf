@@ -11,3 +11,7 @@ resource "google_service_account_key" "esp8266_key" {
     version = 1
   }
 }
+
+data "google_service_account" "github_ci_sa" {
+  account_id = "github-ci"
+}

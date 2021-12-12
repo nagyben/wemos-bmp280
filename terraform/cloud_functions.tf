@@ -1,6 +1,11 @@
 locals {
   timestamp = formatdate("YYMMDDhhmmss", timestamp())
   root_dir  = abspath("../cloud_functions")
+
+  cf_invokers = [
+    "serviceAccount:${google_service_account.esp8266_sa.email}",
+    "serviceAccount:${data.google_service_account.github_ci_sa.email}"
+  ]
 }
 
 data "archive_file" "data_ingestion_source" {
@@ -33,10 +38,11 @@ resource "google_cloudfunctions_function" "receiver_function_authenticated" {
 }
 
 resource "google_cloudfunctions_function_iam_member" "receiver_function_authenticated_invoker" {
+  count          = length(local.cf_invokers)
   project        = google_cloudfunctions_function.receiver_function_authenticated.project
   region         = google_cloudfunctions_function.receiver_function_authenticated.region
   cloud_function = google_cloudfunctions_function.receiver_function_authenticated.name
 
   role   = "roles/cloudfunctions.invoker"
-  member = "serviceAccount:${google_service_account.esp8266_sa.email}"
+  member = local.cf_invokers[count.index]
 }
