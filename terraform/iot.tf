@@ -1,5 +1,5 @@
 resource "google_cloudiot_registry" "cloudiot_registry" {
-  name     = "iot-registry"
+  name = "iot-registry"
 
   region = "europe-west1"
 
