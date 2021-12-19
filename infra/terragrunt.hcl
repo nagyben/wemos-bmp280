@@ -1,13 +1,31 @@
-terraform {
-  backend "gcs" {
+locals {
+  terraform_service_account = "github-ci@nagyben.iam.gserviceaccount.com"
+}
+
+remote_state {
+  backend = "gcs"
+  generate = {
+    path      = "backend.tf"
+    if_exists = "overwrite"
+  }
+  config = {
     bucket                      = "nagyben-tfstate"
-    prefix                      = "terraform/state"
-    impersonate_service_account = "github-ci@nagyben.iam.gserviceaccount.com"
+    prefix                      = "terraform/${path_relative_to_include()}"
+    impersonate_service_account = local.terraform_service_account
   }
 }
 
-locals {
-  terraform_service_account = "github-ci@nagyben.iam.gserviceaccount.com"
+inputs = {
+  impersonate_service_account_email = local.terraform_service_account
+}
+
+generate "provider" {
+  path = "provider.tf"
+  if_exists = "overwrite_terragrunt"
+  contents = <<EOF
+
+variable "impersonate_service_account_email" {
+  type = string
 }
 
 provider "google" {
@@ -28,8 +46,10 @@ provider "google" {
 
 data "google_service_account_access_token" "default" {
   provider               = google.impersonation
-  target_service_account = local.terraform_service_account
+  target_service_account = var.impersonate_service_account_email
   scopes                 = ["userinfo-email", "cloud-platform"]
   lifetime               = "1200s"
 }
+EOF
 
+}

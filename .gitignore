@@ -1,5 +1,6 @@
 .terraform
 .terraform*
+.terragrunt*
 sa.json
 .venv
 .pytest_cache

@@ -1,5 +1,5 @@
 resource "google_secret_manager_secret" "esp8266_pk" {
-  secret_id = "esp8266-pk"
+  secret_id = "esp8266-pk${var.env_suffix}"
 
   replication {
     automatic = true

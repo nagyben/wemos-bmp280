@@ -1,0 +1,68 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      working_directory:
+        required: true
+        type: string
+    secrets:
+      GOOGLE_CREDENTIALS:
+        required: true
+      GOOGLE_PROJECT:
+        required: true
+
+jobs:
+  deploy:
+    name: 'Deploy'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 'Checkout'
+      uses: actions/checkout@v2
+
+    - name: 'install tf'
+      uses: hashicorp/setup-terraform@v1
+
+    - name: 'install python'
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.9'
+
+    - name: 'export requirements'
+      run: |
+        pip install -U pip
+        pip install poetry
+        poetry lock
+        poetry export --without-hashes > requirements.txt
+      env:
+        POETRY_VIRTUALENVS_CREATE: false
+      working-directory: cloud_functions
+
+    - name: 'tg init'
+      run: terragrunt init
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+    - name: 'tg validate'
+      run: terragrunt validate
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+    - name: 'tg plan'
+      run: terragrunt plan -var="project=$GOOGLE_PROJECT"
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+
+    - name: 'tg apply'
+      run: |
+        terragrunt apply --auto-approve -var="project=$GOOGLE_PROJECT"
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}

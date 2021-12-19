@@ -13,9 +13,20 @@ on:
 concurrency: 'workflow'
 
 jobs:
-  test:
+  terraform-deploy-test:
+    name: 'Deploy test infra'
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      environment: test
+      working_directory: infra/app-test
+    secrets:
+      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+      GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+
+  app-test:
     name: 'Test'
     runs-on: ubuntu-latest
+    needs: terraform-deploy-test
 
     services:
       firestore:
@@ -57,67 +68,10 @@ jobs:
         FIRESTORE_EMULATOR_HOST: localhost:8080
         FIRESTORE_PROJECT_ID: dummy-firestore-id
 
-  terraform:
-    name: 'Terraform'
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-    - name: 'Checkout'
-      uses: actions/checkout@v2
-
-    - name: 'install tf'
-      uses: hashicorp/setup-terraform@v1
-
-    - name: 'install python'
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.9'
-
-    - name: 'export requirements'
-      run: |
-        pip install -U pip
-        pip install poetry
-        poetry lock
-        poetry export --without-hashes > requirements.txt
-      env:
-        POETRY_VIRTUALENVS_CREATE: false
-      working-directory: cloud_functions
-
-    - name: 'tf init'
-      run: terraform init
-      working-directory: terraform
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-
-    - name: 'tf validate'
-      run: terraform validate
-      working-directory: terraform
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-
-    - name: 'tf plan'
-      run: terraform plan -var="billing_alert_email=$BILLING_ALERT_EMAIL" -var="project=$GOOGLE_PROJECT"
-      working-directory: terraform
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-        BILLING_ALERT_EMAIL: ${{ secrets.BILLING_ALERT_EMAIL }}
-        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-
-    - name: 'tf apply'
-      run: |
-        echo "$BILLING_ALERT_EMAIL $GOOGLE_PROJECT"
-        terraform apply --auto-approve -var="billing_alert_email=$BILLING_ALERT_EMAIL" -var="project=$GOOGLE_PROJECT"
-      working-directory: terraform
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-        BILLING_ALERT_EMAIL: ${{ secrets.BILLING_ALERT_EMAIL }}
-        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-
   e2e:
     name: e2e
     runs-on: ubuntu-latest
-    needs: terraform
+    needs: terraform-deploy-test
 
     steps:
     - uses: actions/checkout@v2
@@ -126,8 +80,8 @@ jobs:
       uses: hashicorp/setup-terraform@v1
 
     - name: 'tf init'
-      run: terraform init
-      working-directory: terraform
+      run: terragrunt init
+      working-directory: infra/app-test
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
@@ -166,3 +120,14 @@ jobs:
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/creds.json
+
+  terraform-deploy-prod:
+    name: 'Deploy test infra'
+    uses: ./.github/workflows/deploy.yaml
+    needs: e2e
+    with:
+      environment: prod
+      working_directory: infra/app-prod
+    secrets:
+      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+      GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}

@@ -1,10 +1,10 @@
 locals {
   timestamp = formatdate("YYMMDDhhmmss", timestamp())
-  root_dir  = abspath("../cloud_functions")
+  root_dir  = abspath("../../../../../../cloud_functions")
 
   cf_invokers = [
     "serviceAccount:${google_service_account.esp8266_sa.email}",
-    "serviceAccount:${data.google_service_account.github_ci_sa.email}"
+    "serviceAccount:${data.google_service_account.ci_sa.email}"
   ]
 }
 
@@ -20,13 +20,14 @@ data "archive_file" "data_ingestion_source" {
 
 resource "google_storage_bucket_object" "zip" {
   # Append file MD5 to force object to be recreated
-  name   = "function-${data.archive_file.data_ingestion_source.output_md5}.zip"
+  name   = "function${var.env_suffix}-${data.archive_file.data_ingestion_source.output_md5}.zip"
   bucket = google_storage_bucket.functions_storage_bucket.name
   source = data.archive_file.data_ingestion_source.output_path
+  metadata = {}
 }
 
 resource "google_cloudfunctions_function" "receiver_function_authenticated" {
-  name    = "receiver_authenticated"
+  name    = "receiver_authenticated${var.env_suffix}"
   runtime = "python39"
 
   available_memory_mb   = 128
