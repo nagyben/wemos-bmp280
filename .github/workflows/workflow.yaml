@@ -15,7 +15,7 @@ concurrency: 'workflow'
 jobs:
   terraform-deploy-test:
     name: 'Deploy test infra'
-    uses: ./.github/workflows/deploy.yaml@master
+    uses: nagyben/wemos-bmp280/.github/workflows/deploy.yaml@master
     with:
       environment: test
       working_directory: infra/app-test
@@ -123,7 +123,7 @@ jobs:
 
   terraform-deploy-prod:
     name: 'Deploy test infra'
-    uses: ./.github/workflows/deploy.yaml@master
+    uses: nagyben/wemos-bmp280/.github/workflows/deploy.yaml@master
     needs: e2e
     with:
       environment: prod
