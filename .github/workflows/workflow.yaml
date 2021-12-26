@@ -122,7 +122,8 @@ jobs:
       run: |
         set -euo pipefail
         cat ../infra/app-test/tfoutput.json
-        export RECEIVER_URL=$(jq -r ".receiver_url.value" ../infra/app-test/tfoutput.json)
+        jq --version
+        export RECEIVER_URL=$(jq -r .receiver_url.value ../infra/app-test/tfoutput.json)
         pytest e2e/
       working-directory: cloud_functions
       env:
