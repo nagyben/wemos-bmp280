@@ -122,7 +122,7 @@ jobs:
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/creds.json
 
   terraform-deploy-prod:
-    name: 'Deploy test infra'
+    name: 'Deploy prod infra'
     uses: nagyben/wemos-bmp280/.github/workflows/deploy.yaml@master
     needs: e2e
     with:

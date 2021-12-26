@@ -1,5 +1,5 @@
 variable "env_suffix" {
-  type = string
+  type    = string
   default = ""
 }
 
