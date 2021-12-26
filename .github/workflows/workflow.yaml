@@ -79,6 +79,11 @@ jobs:
     - name: 'install tf'
       uses: hashicorp/setup-terraform@v1
 
+    - name: Setup Terragrunt
+      uses: autero1/action-terragrunt@v1.1.0
+      with:
+        terragrunt_version: latest
+
     - name: 'tf init'
       run: terragrunt init
       working-directory: infra/app-test
@@ -86,8 +91,8 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: 'tf output'
-      run: terraform-bin output -json > tfoutput.json
-      working-directory: terraform
+      run: terragrunt output -json > tfoutput.json
+      working-directory: infra/app-test
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
