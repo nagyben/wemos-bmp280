@@ -29,7 +29,7 @@ variable "impersonate_service_account_email" {
 }
 
 provider "google" {
-  project         = "nagyben"
+  project         = var.project
   region          = "europe-west2"
   zone            = "europe-west2-a"
   access_token    = data.google_service_account_access_token.default.access_token
