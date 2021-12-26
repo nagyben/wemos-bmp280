@@ -121,6 +121,7 @@ jobs:
     - name: Test with pytest
       run: |
         set -euo pipefail
+        cat ../infra/app-test/tfoutput.json
         export RECEIVER_URL=$(cat ../infra/app-test/tfoutput.json | jq -r .receiver_url.value)
         pytest e2e/
       working-directory: cloud_functions
