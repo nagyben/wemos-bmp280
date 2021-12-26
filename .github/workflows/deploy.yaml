@@ -25,6 +25,14 @@ jobs:
     - name: 'install tf'
       uses: hashicorp/setup-terraform@v1
 
+    - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v1.1.0
+        with:
+          terragrunt_version: latest
+
+    - name: Interact with Terragrunt
+      run: terragrunt --version
+
     - name: 'install python'
       uses: actions/setup-python@v1
       with:
