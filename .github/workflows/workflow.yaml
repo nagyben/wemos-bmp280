@@ -78,6 +78,8 @@ jobs:
 
     - name: 'install tf'
       uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_wrapper: false
 
     - name: Setup Terragrunt
       uses: autero1/action-terragrunt@v1.1.0
