@@ -96,6 +96,10 @@ jobs:
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
+    - name: 'jq'
+      run: jq -r .receiver_url.value tfoutput.json
+      working-directory: infra/app-test
+
     - name: 'install python'
       uses: actions/setup-python@v1
       with:
