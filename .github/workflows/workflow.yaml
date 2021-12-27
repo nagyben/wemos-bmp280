@@ -97,7 +97,7 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: 'jq'
-      run: jq -r .receiver_url.value tfoutput.json
+      run: jq -r .receiver_url.value tfoutput.json --debug-trace
       working-directory: infra/app-test
 
     - name: 'install python'
