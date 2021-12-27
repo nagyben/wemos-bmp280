@@ -39,7 +39,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: 'install python'
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: '3.9'
 
@@ -101,7 +101,7 @@ jobs:
       working-directory: infra/app-test
 
     - name: 'install python'
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: '3.9'
 
