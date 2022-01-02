@@ -9,3 +9,26 @@ resource "google_cloudiot_registry" "cloudiot_registry" {
   }
 
 }
+
+
+
+resource "google_cloudiot_device" "iot_test_device" {
+  count    = var.env_suffix == "" ? 0 : 1
+  name     = "iot-test-device"
+  registry = google_cloudiot_registry.cloudiot_registry.id
+
+  credentials {
+    public_key {
+      format = "RSA_PEM"
+      key    = google_service_account_key.mqtt_tester_key[0].private_key
+    }
+  }
+
+  blocked = false
+
+  log_level = "INFO"
+
+  gateway_config {
+    gateway_type = "NON_GATEWAY"
+  }
+}
