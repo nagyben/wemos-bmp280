@@ -5,6 +5,8 @@ import unittest.mock as mock
 
 from google.cloud import logging as cloudlogging
 
+COLLECTION = os.getenv("FIRESTORE_COLLECTION_NAME")
+
 
 def _setup_logging():
     lg_client = cloudlogging.Client()

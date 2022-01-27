@@ -16,4 +16,5 @@ variable "project" {
 variable "mqtt_tester_enabled" {
   type        = bool
   description = "Whether or not to create MQTT testing client credentials"
+  default = false
 }
