@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <LittleFS.h>
+#include <helpers.h>
 
 #ifndef DEBUG_PRINT
   #define DEBUG_PRINT(x)
@@ -31,7 +32,15 @@ inline bool isConfigValid(Config &config) {
 
 // Loads the configuration from a file
 inline void loadConfiguration(const char *filename, Config &config) {
-  DEBUG_PRINTLN("Loading config...");
+  STACK;
+  HEAP;
+
+  if (!LittleFS.begin()) {
+    DEBUG_PRINTLN(F("Could not start LittleFS!"));
+    return;
+  }
+
+  DEBUG_PRINT("Loading config: "); DEBUG_PRINTLN(filename);
   File file = LittleFS.open(filename, "r");
 
   // Allocate a temporary JsonDocument
@@ -54,14 +63,18 @@ inline void loadConfiguration(const char *filename, Config &config) {
   String(doc["saEmail"]).toCharArray(config.saEmail, sizeof(config.saEmail));
 
   if (isConfigValid(config)) {
-    DEBUG_PRINTLN("Config loaded!");
+    DEBUG_PRINTLN(F("Config loaded!"));
   } else {
-    DEBUG_PRINTLN("Config is invalid!");
+    DEBUG_PRINTLN(F("Config is invalid!"));
   }
 }
 
 inline String loadPrivateKey() {
-  DEBUG_PRINTLN(F("Reading private key..."));
+  if (!LittleFS.begin()) {
+    DEBUG_PRINTLN(F("Could not start LittleFS!"));
+    return "";
+  }
+  DEBUG_PRINT(F("Reading private key: ")); DEBUG_PRINTLN(GCP_PRIVATE_KEY_FILE);
   File file = LittleFS.open(GCP_PRIVATE_KEY_FILE, "r");
   if (!file) {
     DEBUG_PRINT(F("Could not open ")); DEBUG_PRINTLN(GCP_PRIVATE_KEY_FILE);
