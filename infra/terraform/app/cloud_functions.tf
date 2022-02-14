@@ -34,7 +34,16 @@ resource "google_cloudfunctions_function" "receiver_function_authenticated" {
   available_memory_mb   = 128
   source_archive_bucket = google_storage_bucket.functions_storage_bucket.name
   source_archive_object = google_storage_bucket_object.zip.name
-  trigger_http          = true
+
+  event_trigger {
+    event_type = "google.pubsub.topic.publish"
+    resource = google_pubsub_topic.pubsub_weather_topic.id
+  }
+
+  environment_variables = {
+    FIRESTORE_COLLECTION_NAME = "weather${var.env_suffix}"
+  }
+
   entry_point           = "receiver_function"
   max_instances         = 1
 }

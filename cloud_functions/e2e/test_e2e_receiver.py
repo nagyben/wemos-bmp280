@@ -7,10 +7,9 @@ import pytest
 import requests
 from google.cloud import firestore, pubsub_v1
 
-RECEIVER_URL = os.getenv("RECEIVER_URL")
 GOOGLE_PROJECT = os.getenv("GOOGLE_PROJECT")
 
-COLLECTION = "test_weather"
+COLLECTION = "weather-test"
 
 
 @pytest.fixture(scope="session")
