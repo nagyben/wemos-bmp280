@@ -41,9 +41,12 @@ def test_receiver(token):
 
     docs = db.collection(COLLECTION).stream()
 
-    actual = next(docs).to_dict()
-    print(actual)
-    assert actual == new_doc
+    try:
+        actual = next(docs).to_dict()
+        print(actual)
+        assert actual == new_doc
+    except StopIteration:
+        raise LookupError(f"Could not find any records in {COLLECTION}")
 
 
 def test_mqtt():
@@ -56,16 +59,12 @@ def test_mqtt():
 
     message_json = json.dumps(
         {
-            "data": {"message": "test"},
+            "data": {"message": "test-e2e"},
         }
     )
     message_bytes = message_json.encode("utf-8")
 
     # Publishes a message
-    try:
-        publish_future = publisher.publish(topic_path, data=message_bytes)
-        publish_future.result()  # Verify the publish succeeded
-        return "Message published."
-    except Exception as e:
-        print(e)
-        return (e, 500)
+    publish_future = publisher.publish(topic_path, data=message_bytes)
+    publish_future.result()  # Verify the publish succeeded
+    return "Message published."
