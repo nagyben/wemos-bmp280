@@ -1,10 +1,11 @@
+import json
 import os
 
 import google.auth.transport.requests
 import google.oauth2.id_token
 import pytest
 import requests
-from google.cloud import firestore
+from google.cloud import firestore, pubsub_v1
 
 RECEIVER_URL = os.getenv("RECEIVER_URL")
 GOOGLE_PROJECT = os.getenv("GOOGLE_PROJECT")
@@ -43,3 +44,28 @@ def test_receiver(token):
     actual = next(docs).to_dict()
     print(actual)
     assert actual == new_doc
+
+
+def test_mqtt():
+    # Instantiates a Pub/Sub client
+    publisher = pubsub_v1.PublisherClient()
+    PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
+    TOPIC_NAME = os.getenv("TOPIC_NAME")
+
+    topic_path = publisher.topic_path(PROJECT_ID, TOPIC_NAME)
+
+    message_json = json.dumps(
+        {
+            "data": {"message": "test"},
+        }
+    )
+    message_bytes = message_json.encode("utf-8")
+
+    # Publishes a message
+    try:
+        publish_future = publisher.publish(topic_path, data=message_bytes)
+        publish_future.result()  # Verify the publish succeeded
+        return "Message published."
+    except Exception as e:
+        print(e)
+        return (e, 500)
