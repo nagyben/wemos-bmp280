@@ -52,7 +52,7 @@ def test_receiver(token):
 def test_mqtt():
     # Instantiates a Pub/Sub client
     publisher = pubsub_v1.PublisherClient()
-    PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
+    PROJECT_ID = os.getenv("GOOGLE_PROJECT")
     TOPIC_NAME = os.getenv("TOPIC_NAME")
 
     topic_path = publisher.topic_path(PROJECT_ID, TOPIC_NAME)

@@ -24,7 +24,7 @@ resource "google_storage_bucket_object" "zip" {
   name     = "function${var.env_suffix}-${data.archive_file.data_ingestion_source.output_md5}.zip"
   bucket   = google_storage_bucket.functions_storage_bucket.name
   source   = data.archive_file.data_ingestion_source.output_path
-  metadata = {}
+  # metadata = {}
 }
 
 resource "google_cloudfunctions_function" "receiver_function_authenticated" {
