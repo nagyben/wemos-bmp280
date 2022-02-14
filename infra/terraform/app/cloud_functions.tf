@@ -12,10 +12,11 @@ data "archive_file" "data_ingestion_source" {
   type        = "zip"
   source_dir  = local.root_dir
   output_path = "/tmp/function.zip"
-  excludes = [
-    "${local.root_dir}/tests",
-    "${local.root_dir}/e2e"
-  ]
+  excludes = concat(
+    tolist(fileset(path.module, "../../../../../../cloud_functions/e2e/**")),
+    tolist(fileset(path.module, "../../../../../../cloud_functions/tests/**")),
+    tolist(fileset(path.module, "../../../../../../cloud_functions/.pytest_cache/**"))
+  )
 }
 
 resource "google_storage_bucket_object" "zip" {

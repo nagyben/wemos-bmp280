@@ -19,8 +19,8 @@ resource "google_cloudiot_device" "iot_test_device" {
 
   credentials {
     public_key {
-      format = "RSA_PEM"
-      key    = google_service_account_key.mqtt_tester_key[0].private_key
+      format = "RSA_X509_PEM"
+      key    = base64decode(google_service_account_key.mqtt_tester_key[0].public_key)
     }
   }
 
