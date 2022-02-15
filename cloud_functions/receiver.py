@@ -6,8 +6,6 @@ import os
 
 from google.cloud import logging as cloudlogging
 
-COLLECTION = os.getenv("FIRESTORE_COLLECTION_NAME")
-
 
 def _setup_logging():
     lg_client = cloudlogging.Client()
@@ -43,15 +41,15 @@ def receiver(event, context):
     Returns:
         None. The output is written to Cloud Logging.
     """
-
+    COLLECTION = os.getenv("FIRESTORE_COLLECTION_NAME")
     _setup_logging()
     db = _get_firestore_client()
-    mqtt_message = base64.b64decode(event["data"]).decode("utf-8")
     logging.debug(context)
     logging.debug(event)
+    mqtt_message = base64.b64decode(event["data"]).decode("utf-8")
     logging.debug(mqtt_message)
 
-    return b"OK"
+    # return "OK"
 
     doc = db.collection(COLLECTION).document(datetime.datetime.now().strftime("%Y%m%d"))
 
@@ -60,7 +58,10 @@ def receiver(event, context):
             {
                 "date": datetime.datetime.now().strftime("%Y-%m-%d"),
                 "data": [
-                    {"timestamp": datetime.datetime.now().isoformat(), **request.json}
+                    {
+                        "timestamp": datetime.datetime.now().isoformat(),
+                        **json.loads(mqtt_message),
+                    }
                 ],
             }
         )
@@ -74,4 +75,4 @@ def receiver(event, context):
         )
         doc.update({"data": data})
 
-    return f"OK"
+    return "OK"

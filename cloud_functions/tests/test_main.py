@@ -1,4 +1,6 @@
+import base64
 import datetime
+import json
 import os
 import unittest.mock as mock
 
@@ -19,17 +21,13 @@ def logging(monkeypatch):
 
 
 @pytest.fixture(scope="module")
-def app():
-    return flask.Flask(__name__)
-
-
-@pytest.fixture(scope="module")
 def firebase():
     firebase_admin.initialize_app()
 
 
 @pytest.fixture
 def db(monkeypatch):
+    monkeypatch.setenv("FIRESTORE_COLLECTION_NAME", "weather-test")
     cred = mock.MagicMock(spec=google.auth.credentials.Credentials)
     client = firestore.Client(
         project=os.getenv("FIRESTORE_PROJECT_ID"), credentials=cred
@@ -40,33 +38,43 @@ def db(monkeypatch):
 
 @pytest.fixture
 def empty_db(db):
-    for doc in db.collection(u"weather").stream():
+    for doc in db.collection(u"weather-test").stream():
         doc.reference.delete()
 
 
 # https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/functions/helloworld/main_test.py
 @freezegun.freeze_time("2020-01-01")
-def test_adds_entry_for_date(firebase, app, db, empty_db):
+def test_adds_entry_for_date(firebase, db, empty_db):
     data = {"key": "value"}
     expected_key = "20200101"
     expected_doc = {
         "date": "2020-01-01",
         "data": [{"timestamp": datetime.datetime.now().isoformat(), **data}],
     }
-    with app.test_request_context(json=data):
-        assert main.receiver_function(flask.request) == "OK"
 
-        actual_doc = db.collection(u"weather").document(expected_key).get()
-        assert actual_doc.exists
-        print(actual_doc)
-        assert actual_doc.to_dict() == expected_doc
+    context = {
+        "herp": "derp",
+        "event_id": "event_id",
+        "timestamp": datetime.datetime.now().isoformat(),
+        "resource": {"name": "herp"},
+        "data": base64.b64encode(json.dumps(data).encode()),
+    }
+
+    event = {}
+
+    assert main.receiver_function(context, event) == "OK"
+
+    actual_doc = db.collection(u"weather-test").document(expected_key).get()
+    assert actual_doc.exists
+    print(actual_doc)
+    assert actual_doc.to_dict() == expected_doc
 
 
 @freezegun.freeze_time("2020-01-01 00:15:00")
-def test_adds_entry_to_existing_entries_on_same_day(firebase, app, db, empty_db):
+def test_adds_entry_to_existing_entries_on_same_day(firebase, db, empty_db):
     data = {"key": "value"}
     expected_key = "20200101"
-    db.collection(u"weather").document(expected_key).set(
+    db.collection(u"weather-test").document(expected_key).set(
         {
             "date": "2020-01-01",
             "data": [
@@ -87,10 +95,20 @@ def test_adds_entry_to_existing_entries_on_same_day(firebase, app, db, empty_db)
         ],
     }
 
-    with app.test_request_context(json=data):
-        assert main.receiver_function(flask.request) == "OK"
+    context = {
+        "herp": "derp",
+        "event_id": "event_id",
+        "timestamp": datetime.datetime.now().isoformat(),
+        "resource": {"name": "herp"},
+        "data": base64.b64encode(json.dumps(data).encode()),
+    }
 
-        actual_doc = db.collection(u"weather").document(expected_key).get()
-        assert actual_doc.exists
-        print(actual_doc)
-        assert actual_doc.to_dict() == expected_doc
+    event = {}
+
+    assert main.receiver_function(context, event) == "OK"
+
+    actual_doc = db.collection(u"weather-test").document(expected_key).get()
+    assert actual_doc.exists
+    print(actual_doc.to_dict())
+    print(expected_doc)
+    assert actual_doc.to_dict() == expected_doc
