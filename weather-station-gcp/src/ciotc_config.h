@@ -42,7 +42,7 @@ const unsigned char private_key[] = {
   0x7d, 0xca};
 
 // Time (seconds) to expire token += 20 minutes for drift
-const int jwt_exp_secs = 3600; // Maximum 24H (3600*24)
+const int jwt_exp_secs = 3600 * 24; // Maximum 24H (3600*24)
 
 // Certificates for SSL on the LTS server
 // const char* primary_ca = "-----BEGIN CERTIFICATE-----\n"

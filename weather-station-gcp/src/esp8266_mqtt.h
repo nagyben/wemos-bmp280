@@ -16,6 +16,7 @@
 
 #include <ESP8266WiFi.h>
 #include "FS.h"
+#include "rtc_memory.h"
 
 // You need to set certificates to All SSL cyphers and you may need to
 // increase memory settings in Arduino/cores/esp8266/StackThunk.cpp:
@@ -31,6 +32,10 @@
 #include "ec.h"
 #include "config.h"
 
+typedef struct {
+  char jwt[256];
+  time_t jwtExp = 0;
+} MyJWT;
 
 // !!REPLACEME!!
 // The MQTT callback function for commands and configuration updates
@@ -66,8 +71,34 @@ String getJwt()
   // Disable software watchdog as these operations can take a while.
   ESP.wdtDisable();
   time_t iat = time(nullptr);
-  Serial.println("Refreshing JWT");
-  String jwt = device.createJWT(iat, jwt_exp_secs);
+
+  Serial.println("Loading JWT from RTC");
+  RtcMemory r;
+  bool jwtExistsInRtc = r.begin();
+  MyJWT* myjwt = r.getData<MyJWT>();
+  String jwt;
+  if (!jwtExistsInRtc) {
+    DEBUG_PRINTLN("No JWT found in memory");
+    DEBUG_PRINTLN("Creating JWT");
+    jwt = device.createJWT(iat, jwt_exp_secs);
+    myjwt->jwtExp = iat + jwt_exp_secs;
+    strcpy(myjwt->jwt, jwt.c_str());
+    DEBUG_PRINT("Saving JWT to RTC memory: "); DEBUG_PRINT(myjwt->jwt); DEBUG_PRINT(" expiry: "); DEBUG_PRINTLN(myjwt->jwtExp);
+    r.save();
+  } else {
+    DEBUG_PRINTLN("JWT found in memory");
+    DEBUG_PRINT("cutime "); DEBUG_PRINT(iat); DEBUG_PRINT("\tjwt_expiry "); DEBUG_PRINTLN(myjwt->jwtExp);
+    if (myjwt->jwtExp < iat) {
+      DEBUG_PRINT("JWT expired! Creating new one...");
+      jwt = device.createJWT(iat, jwt_exp_secs);
+      myjwt->jwtExp = iat + jwt_exp_secs;
+      strcpy(myjwt->jwt, jwt.c_str());
+      DEBUG_PRINT("Saving JWT to RTC memory: "); DEBUG_PRINT(myjwt->jwt); DEBUG_PRINT(" expiry: "); DEBUG_PRINTLN(myjwt->jwtExp);
+      r.save();
+    }
+    jwt = String(myjwt->jwt);
+    DEBUG_PRINTLN(jwt);
+  }
   ESP.wdtEnable(0);
   return jwt;
 }
@@ -118,45 +149,6 @@ static void setupCertAndPrivateKey()
   readDerCert("/gtsltsr.crt"); // primary_ca.pem
   readDerCert("/GSR4.crt"); // backup_ca.pem
   netClient.setTrustAnchors(&certList);
-
-
-  // File f = LittleFS.open("/private-key.der", "r");
-  // if (f) {
-  //   size_t size = f.size();
-  //   uint8_t data[size];
-  //   f.read(data, size);
-  //   f.close();
-
-  //   BearSSL::PrivateKey pk(data, size);
-  //   device.setPrivateKey(pk.getEC()->x);
-
-  //   Serial.println("Success to open private-key.der");
-  // } else {
-  //   Serial.println("Failed to open private-key.der");
-  // }
-
-  // LittleFS.end();
-}
-
-static void setupWifi(Config &config)
-{
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(config.ssid, config.password);
-  Serial.println("\n\r\n\rConnecting to WiFi");
-  Serial.println(config.ssid);
-  Serial.println(config.password);
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(100);
-    Serial.print(".");
-  }
-
-  configTime(0, 0, ntp_primary, ntp_secondary);
-  Serial.println("Waiting on time sync...");
-  while (time(nullptr) < 1510644967)
-  {
-    delay(10);
-  }
 }
 
 ///////////////////////////////
@@ -177,9 +169,6 @@ bool publishTelemetry(const char *data, int length)
 // TODO: fix globals
 void setupCloudIoT(Config &config)
 {
-  // ESP8266 WiFi setup
-  setupWifi(config);
-
   // ESP8266 WiFi secure initialization and device private key
   setupCertAndPrivateKey();
 

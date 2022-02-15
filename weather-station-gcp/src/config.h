@@ -32,8 +32,6 @@ inline bool isConfigValid(Config &config) {
 
 // Loads the configuration from a file
 inline void loadConfiguration(const char *filename, Config &config) {
-  STACK;
-  HEAP;
 
   if (!LittleFS.begin()) {
     DEBUG_PRINTLN(F("Could not start LittleFS!"));

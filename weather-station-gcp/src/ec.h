@@ -26,12 +26,6 @@ void readPrivateKeyFromFile(const char* fileName, unsigned char* pkeyBuffer) {
     f.close();
 
     BearSSL::PrivateKey pkey(contents.c_str());
-
-    DEBUG_PRINTLN(F("strncpy((char *)pkeyBuffer, (const char *)ec->x, 32);"));
-
-    STACK; HEAP;
     strncpy((char *)pkeyBuffer, (const char *)pkey.getEC()->x, pkey.getEC()->xlen);
-    STACK; HEAP;
-    DEBUG_PRINTLN(F("return"));
 }
 #endif

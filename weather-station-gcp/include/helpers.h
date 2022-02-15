@@ -25,4 +25,14 @@ void hexprint(const char *arr, size_t length)
   }
   Serial.println();
 }
+
+void blink(int n){
+  for(int i = 0; i < n; i++) {
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(100);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(100);
+  }
+}
+
 #endif
