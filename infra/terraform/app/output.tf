@@ -3,7 +3,7 @@ output "receiver_url" {
 }
 
 output "mqtt_tester_public_key" {
-  value = base64decode(google_service_account_key.mqtt_tester_key[0].public_key)
+  value = length(google_service_account_key.mqtt_tester_key) > 0 ? base64decode(google_service_account_key.mqtt_tester_key[0].public_key) : null
 }
 
 output "topic_name" {
