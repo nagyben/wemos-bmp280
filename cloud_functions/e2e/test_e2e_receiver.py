@@ -1,5 +1,6 @@
 import json
 import os
+import time
 
 import google.auth.transport.requests
 import google.oauth2.id_token
@@ -43,11 +44,14 @@ def test_mqtt(db):
     publish_future = publisher.publish(topic_path, data=message_bytes)
     publish_future.result()  # Verify the publish succeeded
 
+    time.sleep(5)  # wait for the cloud function to do its thing
+
     docs = db.collection(COLLECTION).stream()
 
     try:
         actual = next(docs).to_dict()
         print(actual)
-        assert actual == new_doc
+        assert "data" in actual
+        assert "data" in actual["data"][0]
     except StopIteration:
         raise LookupError(f"Could not find any records in {COLLECTION}")
