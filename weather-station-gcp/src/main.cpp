@@ -71,6 +71,12 @@ void initWiFi(Config &config, int timeout = MAX_WIFI_CONNECT_TIME)
   while (time(nullptr) < 1510644967)
   {
     delay(10);
+    if (millis() - start > timeout)
+    {
+      DEBUG_PRINTLN(F("Time failed to sync within power budget"));
+      DEBUG_PRINTLN(F("Deep sleeping..."));
+      ESP.deepSleep(DEEPSLEEP_TIME, WAKE_RF_DISABLED);
+    }
   }
 }
 
