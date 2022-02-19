@@ -1,4 +1,4 @@
-#define DEBUG
+// #define DEBUG
 #ifdef DEBUG
 #define DEBUG_PRINT(x) Serial.print(x)
 #define DEBUG_PRINTLN(x) Serial.println(x)
@@ -33,6 +33,7 @@ Config config;
 IPAddress IP(192, 168, 1, 132);
 IPAddress GW(192, 168, 1, 1);
 IPAddress MASK(255, 255, 255, 0);
+IPAddress DNS(8, 8, 8, 8);
 const int CHANNEL = 1; // wifi channel
 const uint8_t MAC[6] = {0xB0, 0x6E, 0xBF, 0x7C, 0x0F, 0x68};
 const int MAX_WIFI_CONNECT_TIME = 10 * 1e3; // milliseconds
@@ -45,7 +46,7 @@ void initWiFi(Config &config, int timeout = MAX_WIFI_CONNECT_TIME)
   yield();                // IMPORTANT!
   WiFi.persistent(false); // Disable the WiFi persistence.  The ESP8266 will not load and save WiFi settings in the flash memory.
   WiFi.mode(WIFI_STA);
-  // WiFi.begin(config.ssid, config.password);
+  WiFi.config(IP, GW, MASK, DNS); // need this to speed up wifi connect
   WiFi.begin(config.ssid, config.password, CHANNEL, MAC, true);
   DEBUG_PRINT(F("Connecting to WiFi .."));
   long start = millis();
@@ -62,15 +63,15 @@ void initWiFi(Config &config, int timeout = MAX_WIFI_CONNECT_TIME)
     }
   }
 
+  DEBUG_PRINT(F("Connected, IP address: "));
+  DEBUG_PRINTLN(WiFi.localIP());
+
   configTime(0, 0, ntp_primary, ntp_secondary);
   Serial.println("Waiting on time sync...");
   while (time(nullptr) < 1510644967)
   {
     delay(10);
   }
-
-  DEBUG_PRINT(F("Connected, IP address: "));
-  DEBUG_PRINTLN(WiFi.localIP());
 }
 
 void wifiDisconnect(void)
