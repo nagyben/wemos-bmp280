@@ -113,7 +113,6 @@ void setup()
   long postConnectTime = millis();
 
   setupCloudIoT(config); // Creates globals for MQTT
-  pinMode(LED_BUILTIN, OUTPUT);
 
   if (!mqtt->loop())
   {
