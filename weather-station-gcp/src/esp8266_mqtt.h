@@ -32,6 +32,8 @@
 #include "ec.h"
 #include "config.h"
 
+#define GCP_PRIVATE_KEY "/ec_private.pem"
+
 typedef struct {
   char jwt[256];
   time_t jwtExp = 0;
@@ -42,6 +44,7 @@ typedef struct {
 // Place your message handler code here.
 void messageReceivedAdvanced(MQTTClient *client, char topic[], char bytes[], int length)
 {
+  return;
   Serial.printf("Incoming Topic: %s", topic);
   if (length > 0)// On message
   {
@@ -72,28 +75,28 @@ String getJwt()
   ESP.wdtDisable();
   time_t iat = time(nullptr);
 
-  Serial.println("Loading JWT from RTC");
+  DEBUG_PRINTLN(F("Loading JWT from RTC"));
   RtcMemory r;
   bool jwtExistsInRtc = r.begin();
   MyJWT* myjwt = r.getData<MyJWT>();
   String jwt;
   if (!jwtExistsInRtc) {
-    DEBUG_PRINTLN("No JWT found in memory");
-    DEBUG_PRINTLN("Creating JWT");
+    DEBUG_PRINTLN(F("No JWT found in memory"));
+    DEBUG_PRINTLN(F("Creating JWT"));
     jwt = device.createJWT(iat, jwt_exp_secs);
     myjwt->jwtExp = iat + jwt_exp_secs;
     strcpy(myjwt->jwt, jwt.c_str());
-    DEBUG_PRINT("Saving JWT to RTC memory: "); DEBUG_PRINT(myjwt->jwt); DEBUG_PRINT(" expiry: "); DEBUG_PRINTLN(myjwt->jwtExp);
+    DEBUG_PRINT(F("Saving JWT to RTC memory: ")); DEBUG_PRINT(myjwt->jwt); DEBUG_PRINT(F(" expiry: ")); DEBUG_PRINTLN(myjwt->jwtExp);
     r.save();
   } else {
-    DEBUG_PRINTLN("JWT found in memory");
-    DEBUG_PRINT("cutime "); DEBUG_PRINT(iat); DEBUG_PRINT("\tjwt_expiry "); DEBUG_PRINTLN(myjwt->jwtExp);
+    DEBUG_PRINTLN(F("JWT found in memory"));
+    DEBUG_PRINT(F("cutime ")); DEBUG_PRINT(iat); DEBUG_PRINT(F("\tjwt_expiry ")); DEBUG_PRINTLN(myjwt->jwtExp);
     if (myjwt->jwtExp < iat) {
-      DEBUG_PRINT("JWT expired! Creating new one...");
+      DEBUG_PRINTLN(F("JWT expired! Creating new one..."));
       jwt = device.createJWT(iat, jwt_exp_secs);
       myjwt->jwtExp = iat + jwt_exp_secs;
       strcpy(myjwt->jwt, jwt.c_str());
-      DEBUG_PRINT("Saving JWT to RTC memory: "); DEBUG_PRINT(myjwt->jwt); DEBUG_PRINT(" expiry: "); DEBUG_PRINTLN(myjwt->jwtExp);
+      DEBUG_PRINT(F("Saving JWT to RTC memory: ")); DEBUG_PRINT(myjwt->jwt); DEBUG_PRINT(F(" expiry: ")); DEBUG_PRINTLN(myjwt->jwtExp);
       r.save();
     }
     jwt = String(myjwt->jwt);
@@ -101,6 +104,16 @@ String getJwt()
   }
   ESP.wdtEnable(0);
   return jwt;
+}
+
+void invalidateJWT() {
+  DEBUG_PRINTLN(F("Invalidating JWT..."));
+  RtcMemory r;
+  r.begin();
+  MyJWT* myjwt = r.getData<MyJWT>();
+  myjwt->jwtExp = 0;
+  r.save();
+  DEBUG_PRINTLN(F("JWT invalidated"));
 }
 
 static void readDerCert(const char *filename) {
@@ -131,7 +144,7 @@ static void setupCertAndPrivateKey()
   // netClient.setTrustAnchors(&certList);
 
   unsigned char private_key[32];
-  readPrivateKeyFromFile("/ec_private.pem", private_key);
+  readPrivateKeyFromFile(GCP_PRIVATE_KEY, private_key);
 
   device.setPrivateKey(private_key);
   // return;

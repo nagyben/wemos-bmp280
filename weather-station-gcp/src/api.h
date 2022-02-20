@@ -59,13 +59,13 @@ String postData(WiFiClient &client, HTTPClient &http, const char* url, const cha
 
   if (httpStatusCode > 0)
   {
-    DEBUG_PRINT("HTTP Response code: ");
+    DEBUG_PRINT(F("HTTP Response code: "));
     DEBUG_PRINTLN(httpStatusCode);
     payload = http.getString();
   }
   else
   {
-    DEBUG_PRINT("Error code: ");
+    DEBUG_PRINT(F("Error code: "));
     DEBUG_PRINTLN(httpStatusCode);
   }
   // Free resources
@@ -122,7 +122,7 @@ inline void getJWT(const char* payload, uint16_t payloadLength, const char* priv
   strcpy(jwt, RS256_JWT_HEADER);
   strcat(jwt, ".");
 
-  DEBUG_PRINT("payload: "); DEBUG_PRINTLN(payload);
+  DEBUG_PRINT(F("payload: ")); DEBUG_PRINTLN(payload);
   auto encodedPayload = std::make_unique<unsigned char[]>(1024);
   base64UrlEncode((unsigned char*) payload, payloadLength, encodedPayload.get());
   strcat(jwt, (char*) encodedPayload.get());

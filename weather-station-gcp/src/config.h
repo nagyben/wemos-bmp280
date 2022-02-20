@@ -13,20 +13,15 @@
   #define DEBUG_PRINTLN(x)
 #endif
 
-#define GCP_PRIVATE_KEY_FILE "esp8266_sa.pem"
-
 struct Config {
   char ssid[32];
   char password[16];
-  char url[128];
-  char saEmail[64];
 };
 
 inline bool isConfigValid(Config &config) {
   return !(
     (strcmp(config.ssid, "") == 0)
     | (strcmp(config.password, "") == 0)
-    | (strcmp(config.url, "") == 0)
   );
 }
 
@@ -38,7 +33,7 @@ inline void loadConfiguration(const char *filename, Config &config) {
     return;
   }
 
-  DEBUG_PRINT("Loading config: "); DEBUG_PRINTLN(filename);
+  DEBUG_PRINT(F("Loading config: ")); DEBUG_PRINTLN(filename);
   File file = LittleFS.open(filename, "r");
 
   // Allocate a temporary JsonDocument
@@ -57,28 +52,12 @@ inline void loadConfiguration(const char *filename, Config &config) {
   // Copy values from the JsonDocument to the Config
   String(doc["ssid"]).toCharArray(config.ssid, sizeof(config.ssid));
   String(doc["password"]).toCharArray(config.password, sizeof(config.password));
-  String(doc["url"]).toCharArray(config.url, sizeof(config.url));
-  String(doc["saEmail"]).toCharArray(config.saEmail, sizeof(config.saEmail));
 
   if (isConfigValid(config)) {
     DEBUG_PRINTLN(F("Config loaded!"));
   } else {
     DEBUG_PRINTLN(F("Config is invalid!"));
   }
-}
-
-inline String loadPrivateKey() {
-  if (!LittleFS.begin()) {
-    DEBUG_PRINTLN(F("Could not start LittleFS!"));
-    return "";
-  }
-  DEBUG_PRINT(F("Reading private key: ")); DEBUG_PRINTLN(GCP_PRIVATE_KEY_FILE);
-  File file = LittleFS.open(GCP_PRIVATE_KEY_FILE, "r");
-  if (!file) {
-    DEBUG_PRINT(F("Could not open ")); DEBUG_PRINTLN(GCP_PRIVATE_KEY_FILE);
-  }
-
-  return file.readString();
 }
 
 #endif
