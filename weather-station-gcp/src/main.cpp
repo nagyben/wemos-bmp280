@@ -76,8 +76,9 @@ void initWiFi(Config &config, u_long timeout = MAX_WIFI_CONNECT_TIME)
   DEBUG_PRINT(F("Connected, IP address: "));
   DEBUG_PRINTLN(WiFi.localIP());
 
+void timeSync() {
   configTime(0, 0, ntp_primary, ntp_secondary);
-  Serial.println("Waiting on time sync...");
+  DEBUG_PRINTLN(F("Waiting on time sync..."));
   while (time(nullptr) < 1510644967)
   {
     delay(10);
@@ -87,16 +88,17 @@ void initWiFi(Config &config, u_long timeout = MAX_WIFI_CONNECT_TIME)
       deepSleep();
     }
   }
+  DEBUG_PRINTLN(F("Time synchronised"));
 }
 
-void wifiDisconnect(void)
+void wifiDisconnect()
 {
-  DEBUG_PRINT(F(", wifi"));
+  DEBUG_PRINT(F("Disconnecting wifi..."));
   WiFi.disconnect();
   WiFi.mode(WIFI_OFF);
   delay(100); // FIXME
 
-  DEBUG_PRINTLN(F(", sleeping"));
+  DEBUG_PRINTLN(F("Forcing RF sleep..."));
   WiFi.forceSleepBegin(); // turn off ESP8266 RF
   delay(100);             // FIXME
 }
