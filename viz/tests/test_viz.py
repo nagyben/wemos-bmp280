@@ -8,10 +8,12 @@ import numpy
 import pandas
 import pandas.testing
 import pytest
-from google.cloud import firestore
+from google.cloud import firestore, storage
+from google.auth.credentials import AnonymousCredentials
 
 import viz
 
+FIREBASE_COLLECTION = "weather-test"
 
 @pytest.fixture(scope="session")
 def firestore_data():
@@ -64,12 +66,19 @@ def db(monkeypatch):
         project=os.getenv("FIRESTORE_PROJECT_ID"), credentials=cred
     )
     monkeypatch.setattr(viz, "_get_firestore_client", lambda: client)
+    monkeypatch.setenv("FIREBASE_COLLECTION", FIREBASE_COLLECTION)
     return client
 
+@pytest.fixture
+def gcs_client():
+    return storage.Client(
+        credentials=AnonymousCredentials(),
+        project="test"
+    )
 
 def test_load_data(firestore_data, db):
     data = firestore_data.to_dict(orient="records")
-    db.collection(u"weather").document(u"20210101").set(
+    db.collection(FIREBASE_COLLECTION).document(u"20210101").set(
         {
             "date": "2020-01-01",
             "data": data,
@@ -77,3 +86,11 @@ def test_load_data(firestore_data, db):
     )
     df = viz.load_data()
     pandas.testing.assert_frame_equal(firestore_data, df, check_like=True)
+
+
+def test_uploads_output_to_bucket(gcs_client):
+    bucket = gcs_client.create_bucket("bucket")
+
+    viz.
+
+    assert bucket.blob("index.html").exists()
