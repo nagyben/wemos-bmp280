@@ -7,4 +7,4 @@ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poet
 echo source /home/vscode/.poetry/env >> /home/vscode/.zshrc
 echo source /home/vscode/.poetry/env >> /home/vscode/.bashrc
 source $HOME/.poetry/env
-poetry config virtualenvs.create false
+# poetry config virtualenvs.create false

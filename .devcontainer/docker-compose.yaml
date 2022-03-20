@@ -15,6 +15,7 @@ services:
       FIRESTORE_EMULATOR_HOST: localhost:8080
       FIRESTORE_PROJECT_ID: dummy-firestore-id
       GOOGLE_APPLICATION_CREDENTIALS: /workspace/cloud_functions/tests/fake_creds.json
+      STORAGE_EMULATOR_HOST: http://localhost:8090
 
     init: true
     volumes:
@@ -39,7 +40,7 @@ services:
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
-    network_mode: service:firestore
+    network_mode: host
 
   firestore:
     build:
@@ -51,3 +52,11 @@ services:
     environment:
       FIRESTORE_PROJECT_ID: dummy-firestore-id
       GCLOUD_PROJECT: dummy-firestore-id
+
+  gcs:
+    image: fsouza/fake-gcs-server
+    ports:
+      - 8090:8090
+    restart: unless-stopped
+    entrypoint: fake-gcs-server -backend memory -port 8090 -scheme http
+    # network_mode: service:firestore
