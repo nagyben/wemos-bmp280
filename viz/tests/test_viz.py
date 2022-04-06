@@ -15,6 +15,7 @@ import viz
 
 FIREBASE_COLLECTION = "weather-test"
 
+
 @pytest.fixture(scope="session")
 def firestore_data():
     return pandas.DataFrame(
@@ -69,14 +70,23 @@ def db(monkeypatch):
     monkeypatch.setenv("FIREBASE_COLLECTION", FIREBASE_COLLECTION)
     return client
 
+
+def delete_documents(db: firestore.Client):
+    docs = db.collection(FIREBASE_COLLECTION).stream()
+
+    for doc in docs:
+        doc.reference.delete()
+
+
 @pytest.fixture
-def gcs_client():
-    return storage.Client(
-        credentials=AnonymousCredentials(),
-        project="test"
-    )
+def gcs_client(monkeypatch):
+    client = storage.Client(credentials=AnonymousCredentials(), project="test")
+    monkeypatch.setattr(viz, "gcs_client", lambda: client)
+    return client
+
 
 def test_load_data(firestore_data, db):
+    delete_documents(db)
     data = firestore_data.to_dict(orient="records")
     db.collection(FIREBASE_COLLECTION).document(u"20210101").set(
         {
@@ -88,9 +98,47 @@ def test_load_data(firestore_data, db):
     pandas.testing.assert_frame_equal(firestore_data, df, check_like=True)
 
 
-def test_uploads_output_to_bucket(gcs_client):
+def test_load_multiple_data(db):
+    data = {
+        "timestamp": datetime.datetime.now(),
+        "key": numpy.nan,
+    }
+    data2 = {
+        "timestamp": datetime.datetime.now(),
+        "key": numpy.nan,
+    }
+    expected = pandas.DataFrame([data, data2])
+    expected["timestamp"] = expected["timestamp"].dt.tz_localize("utc")
+    db.collection(FIREBASE_COLLECTION).document(u"20210101").set(
+        {
+            "date": "2020-01-01",
+            "data": [data],
+        }
+    )
+    db.collection(FIREBASE_COLLECTION).document(u"20210102").set(
+        {
+            "date": "2020-01-02",
+            "data": [data2],
+        }
+    )
+    df = viz.load_data()
+    print(expected)
+    print("=====")
+    print(df)
+    pandas.testing.assert_frame_equal(expected, df, check_like=True)
+
+
+def test_update_uploads_output_to_bucket(gcs_client, db, firestore_data):
     bucket = gcs_client.create_bucket("bucket")
 
-    viz.
+    data = firestore_data.to_dict(orient="records")
+    db.collection(FIREBASE_COLLECTION).document(u"20210101").set(
+        {
+            "date": "2020-01-01",
+            "data": data,
+        }
+    )
+
+    viz.update()
 
     assert bucket.blob("index.html").exists()

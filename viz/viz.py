@@ -5,7 +5,8 @@ import pandas
 import plotly
 import plotly.io
 import plotly.subplots
-from google.cloud import firestore
+from google.cloud import firestore, storage
+import os
 
 env = jinja2.Environment(
     loader=jinja2.FileSystemLoader("templates"), autoescape=jinja2.select_autoescape()
@@ -21,9 +22,17 @@ def render() -> str:
 
 
 def load_data() -> pandas.DataFrame:
+    collection_name = os.getenv("FIREBASE_COLLECTION")
     db = _get_firestore_client()
-    data = db.collection("weather").document("20210101").get().to_dict()["data"]
-    df = pandas.DataFrame(data)
+    docs = db.collection(collection_name).stream()
+
+    df = pandas.DataFrame(next(docs).to_dict()["data"])
+
+    for doc in docs:
+        df = pandas.concat([df, pandas.DataFrame(doc.to_dict()["data"])])
+
+    # df["timestamp"] = pandas.to_datetime(df["timestamp"], utc=True)#.dt.tz_localize("utc")
+    df = df.reset_index(drop=True)
     return df
 
 
@@ -96,3 +105,16 @@ def _render_plotly_html(fig: plotly.graph_objects.Figure) -> str:
     return plotly.io.to_html(
         fig, include_plotlyjs=False, include_mathjax=False, full_html=False
     )
+
+
+def update():
+    html = render()
+    client = gcs_client()
+    bucket = client.bucket("bucket")
+    blob = bucket.blob("index.html")
+    blob.upload_from_string(html)
+
+
+def gcs_client():
+    print("real client")
+    return storage.Client()
