@@ -4,7 +4,7 @@ resource "google_storage_bucket" "functions_storage_bucket" {
 }
 
 resource "google_storage_bucket" "static_site" {
-  name = "exantas.me/weather${var.env_suffix}"
+  name = "weather-static-site${var.env_suffix}"
   location = "EU"
 
   force_destroy = true
