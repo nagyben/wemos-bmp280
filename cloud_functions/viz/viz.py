@@ -1,4 +1,5 @@
 import datetime
+import os
 
 import jinja2
 import pandas
@@ -6,7 +7,6 @@ import plotly
 import plotly.io
 import plotly.subplots
 from google.cloud import firestore, storage
-import os
 
 env = jinja2.Environment(
     loader=jinja2.FileSystemLoader("templates"), autoescape=jinja2.select_autoescape()

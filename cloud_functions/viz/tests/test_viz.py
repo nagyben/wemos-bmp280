@@ -8,8 +8,8 @@ import numpy
 import pandas
 import pandas.testing
 import pytest
-from google.cloud import firestore, storage
 from google.auth.credentials import AnonymousCredentials
+from google.cloud import firestore, storage
 
 import viz
 
