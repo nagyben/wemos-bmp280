@@ -3,24 +3,25 @@ import datetime
 import json
 import logging
 import os
+from typing import Any
 
 from google.cloud import logging as cloudlogging
 
 
-def _setup_logging():
-    lg_client = cloudlogging.Client()
-    lg_client.setup_logging(log_level=logging.DEBUG)
+def _setup_logging() -> None:
+    lg_client = cloudlogging.Client()  # type: ignore
+    lg_client.setup_logging(log_level=logging.DEBUG)  # type: ignore
 
 
 from firebase_admin import firestore
 
 
-def _get_firestore_client():
+def _get_firestore_client() -> firestore.Client:
     logging.debug("Getting firestore client...")
     return firestore.Client()
 
 
-def receiver(event, context):
+def receiver(event: Any, context: Any) -> str:
     """Background Cloud Function to be triggered by Pub/Sub.
     Args:
          event (dict):  The dictionary with data specific to this type of

@@ -1,9 +1,7 @@
+from typing import Any
+
 import receiver
 
 
-def receiver_function(event, context):
+def receiver_function(event: Any, context: Any) -> str:
     return receiver.receiver(event, context)
-
-
-def receiver_authenticated(event, context):
-    return "OK"
