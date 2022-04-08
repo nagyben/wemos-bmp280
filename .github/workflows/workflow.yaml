@@ -168,10 +168,58 @@ jobs:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/creds.json
 
+  viz-e2e:
+    name: viz-e2e
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: 'Checkout'
+      uses: actions/checkout@v2
+
+    - name: 'install python'
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: 'install e2e dependencies'
+      run: |
+        pip install -U pip
+        pip install -r requirements.txt
+      env:
+        POETRY_VIRTUALENVS_CREATE: false
+      working-directory: cloud_functions/viz/e2e
+
+    - name: 'install tf'
+      uses: hashicorp/setup-terraform@v1
+
+    - name: 'tg init'
+      run: terraform init
+      working-directory: infra/app-test
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+    - name: 'tg output'
+      run: terraform-bin output -json > tfoutput.json
+      working-directory: infra/app-test
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+    - name: 'pytest'
+      run: |
+        echo $GOOGLE_CREDENTIALS > /tmp/creds.json
+        export URL=$(jq -r ".viz_url.value" ../terraform/tfoutput.json)
+        python -m pytest e2e/
+      working-directory: cloud_functions/viz
+      env:
+        GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_APPLICATION_CREDENTIALS: /tmp/creds.json
+
   terraform-deploy-prod:
     name: 'Deploy prod infra'
     uses: nagyben/wemos-bmp280/.github/workflows/deploy.yaml@master
-    needs: receiver-e2e
+    needs: [receiver-e2e, viz-e2e]
     with:
       environment: prod
       working_directory: infra/app-prod
