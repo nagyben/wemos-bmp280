@@ -1,5 +1,6 @@
 import datetime
 import os
+from typing import Any
 
 import jinja2
 import pandas
@@ -101,13 +102,13 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
     return fig
 
 
-def _render_plotly_html(fig: plotly.graph_objects.Figure) -> str:
+def _render_plotly_html(fig: plotly.graph_objects.Figure) -> Any:
     return plotly.io.to_html(
         fig, include_plotlyjs=False, include_mathjax=False, full_html=False
     )
 
 
-def update():
+def update() -> None:
     html = render()
     client = gcs_client()
     bucket = client.bucket("bucket")
@@ -115,6 +116,6 @@ def update():
     blob.upload_from_string(html)
 
 
-def gcs_client():
+def gcs_client() -> storage.Client:
     print("real client")
     return storage.Client()
