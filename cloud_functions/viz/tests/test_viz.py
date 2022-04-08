@@ -88,7 +88,7 @@ def gcs_client(monkeypatch):
 def test_load_data(firestore_data, db):
     delete_documents(db)
     data = firestore_data.to_dict(orient="records")
-    db.collection(FIREBASE_COLLECTION).document(u"20210101").set(
+    db.collection(FIREBASE_COLLECTION).document("20210101").set(
         {
             "date": "2020-01-01",
             "data": data,
@@ -109,13 +109,13 @@ def test_load_multiple_data(db):
     }
     expected = pandas.DataFrame([data, data2])
     expected["timestamp"] = expected["timestamp"].dt.tz_localize("utc")
-    db.collection(FIREBASE_COLLECTION).document(u"20210101").set(
+    db.collection(FIREBASE_COLLECTION).document("20210101").set(
         {
             "date": "2020-01-01",
             "data": [data],
         }
     )
-    db.collection(FIREBASE_COLLECTION).document(u"20210102").set(
+    db.collection(FIREBASE_COLLECTION).document("20210102").set(
         {
             "date": "2020-01-02",
             "data": [data2],
@@ -132,7 +132,7 @@ def test_update_uploads_output_to_bucket(gcs_client, db, firestore_data):
     bucket = gcs_client.create_bucket("bucket")
 
     data = firestore_data.to_dict(orient="records")
-    db.collection(FIREBASE_COLLECTION).document(u"20210101").set(
+    db.collection(FIREBASE_COLLECTION).document("20210101").set(
         {
             "date": "2020-01-01",
             "data": data,

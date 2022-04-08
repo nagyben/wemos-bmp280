@@ -38,7 +38,7 @@ def db(monkeypatch):
 
 @pytest.fixture
 def empty_db(db):
-    for doc in db.collection(u"weather-test").stream():
+    for doc in db.collection("weather-test").stream():
         doc.reference.delete()
 
 
@@ -64,7 +64,7 @@ def test_adds_entry_for_date(firebase, db, empty_db):
 
     assert main.receiver_function(context, event) == "OK"
 
-    actual_doc = db.collection(u"weather-test").document(expected_key).get()
+    actual_doc = db.collection("weather-test").document(expected_key).get()
     assert actual_doc.exists
     print(actual_doc)
     assert actual_doc.to_dict() == expected_doc
@@ -74,7 +74,7 @@ def test_adds_entry_for_date(firebase, db, empty_db):
 def test_adds_entry_to_existing_entries_on_same_day(firebase, db, empty_db):
     data = {"key": "value"}
     expected_key = "20200101"
-    db.collection(u"weather-test").document(expected_key).set(
+    db.collection("weather-test").document(expected_key).set(
         {
             "date": "2020-01-01",
             "data": [
@@ -107,7 +107,7 @@ def test_adds_entry_to_existing_entries_on_same_day(firebase, db, empty_db):
 
     assert main.receiver_function(context, event) == "OK"
 
-    actual_doc = db.collection(u"weather-test").document(expected_key).get()
+    actual_doc = db.collection("weather-test").document(expected_key).get()
     assert actual_doc.exists
     print(actual_doc.to_dict())
     print(expected_doc)
