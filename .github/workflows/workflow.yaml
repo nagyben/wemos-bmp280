@@ -170,7 +170,7 @@ jobs:
   terraform-deploy-prod:
     name: 'Deploy prod infra'
     uses: nagyben/wemos-bmp280/.github/workflows/deploy.yaml@master
-    needs: [receiver-e2e, app-test]
+    needs: [receiver-e2e, receiver-unit-test, viz-unit-test]
     with:
       environment: prod
       working_directory: infra/app-prod
