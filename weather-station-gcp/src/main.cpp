@@ -36,60 +36,10 @@ IPAddress MASK(255, 255, 255, 0);
 IPAddress DNS(8, 8, 8, 8);
 const int CHANNEL = 1; // wifi channel
 const uint8_t MAC[6] = {0xB0, 0x6E, 0xBF, 0x7C, 0x0F, 0x68};
-const int MAX_WIFI_CONNECT_TIME = 10 * 1e3; // milliseconds
+const int TIMEOUT = 10 * 1e3; // milliseconds
 
 void bmeSensorJson(DynamicJsonDocument &d);
 
-inline void deepSleep() {
-  DEBUG_PRINT(F("Deep sleeping for ")); DEBUG_PRINT(DEEPSLEEP_TIME / 1e6); DEBUG_PRINTLN(F(" seconds..."));
-  // WAKE_RF_DISABLED to keep the WiFi radio disabled when we wake up
-  /*
-   !!!
-   ---> don't forget to connect D0 to RST!!
-   !!!
-  */
-  ESP.deepSleep(DEEPSLEEP_TIME, WAKE_RF_DISABLED);
-}
-
-void initWiFi(Config &config, u_long timeout = MAX_WIFI_CONNECT_TIME)
-{
-  WiFi.forceSleepWake();
-  yield();                // IMPORTANT!
-  WiFi.persistent(false); // Disable the WiFi persistence.  The ESP8266 will not load and save WiFi settings in the flash memory.
-  WiFi.mode(WIFI_STA);
-  WiFi.config(IP, GW, MASK, DNS); // need this to speed up wifi connect
-  WiFi.begin(config.ssid, config.password, CHANNEL, MAC, true);
-  DEBUG_PRINT(F("Connecting to WiFi .."));
-  u_long start = millis();
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    DEBUG_PRINT('.');
-    BLINK(1);
-    delay(100);
-    if (millis() - start > timeout)
-    {
-      DEBUG_PRINTLN(F("WiFi failed to connect within power budget"));
-      deepSleep();
-    }
-  }
-
-  DEBUG_PRINT(F("Connected, IP address: "));
-  DEBUG_PRINTLN(WiFi.localIP());
-
-void timeSync() {
-  configTime(0, 0, ntp_primary, ntp_secondary);
-  DEBUG_PRINTLN(F("Waiting on time sync..."));
-  while (time(nullptr) < 1510644967)
-  {
-    delay(10);
-    if (millis() - start > timeout)
-    {
-      DEBUG_PRINTLN(F("Time failed to sync within power budget"));
-      deepSleep();
-    }
-  }
-  DEBUG_PRINTLN(F("Time synchronised"));
-}
 
 void wifiDisconnect()
 {
@@ -101,6 +51,57 @@ void wifiDisconnect()
   DEBUG_PRINTLN(F("Forcing RF sleep..."));
   WiFi.forceSleepBegin(); // turn off ESP8266 RF
   delay(100);             // FIXME
+}
+
+inline void deepSleep() {
+  DEBUG_PRINT(F("Deep sleeping for ")); DEBUG_PRINT(DEEPSLEEP_TIME / 1e6); DEBUG_PRINTLN(F(" seconds..."));
+  wifiDisconnect();
+  /*
+   !!!
+   ---> don't forget to connect D0 to RST!!
+   !!!
+  */
+  ESP.deepSleep(DEEPSLEEP_TIME, WAKE_RF_DISABLED);
+}
+
+void initWiFi(Config &config) {
+  WiFi.forceSleepWake();
+  yield();                // IMPORTANT!
+  WiFi.persistent(false); // Disable the WiFi persistence.  The ESP8266 will not load and save WiFi settings in the flash memory.
+  WiFi.mode(WIFI_STA);
+  WiFi.config(IP, GW, MASK, DNS); // need this to speed up wifi connect
+  WiFi.begin(config.ssid, config.password, CHANNEL, MAC, true);
+  DEBUG_PRINT(F("Connecting to WiFi .."));
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    DEBUG_PRINT('.');
+    BLINK(1);
+    delay(100);
+    if (millis() > TIMEOUT)
+    {
+      DEBUG_PRINTLN(F("WiFi failed to connect within power budget"));
+      deepSleep();
+    }
+  }
+
+  DEBUG_PRINT(F("Connected, IP address: "));
+  DEBUG_PRINTLN(WiFi.localIP());
+
+}
+
+void timeSync() {
+  configTime(0, 0, ntp_primary, ntp_secondary);
+  DEBUG_PRINTLN(F("Waiting on time sync..."));
+  while (time(nullptr) < 1510644967)
+  {
+    delay(10);
+    if (millis() > TIMEOUT)
+    {
+      DEBUG_PRINTLN(F("Time failed to sync within power budget"));
+      deepSleep();
+    }
+  }
+  DEBUG_PRINTLN(F("Time synchronised"));
 }
 
 void setup()
@@ -124,6 +125,8 @@ void setup()
   long postConnectTime = millis();
 
   setupCloudIoT(config); // Creates globals for MQTT
+
+  timeSync();
 
   if (!mqtt->loop())
   {
