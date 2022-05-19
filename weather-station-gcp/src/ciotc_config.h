@@ -21,7 +21,7 @@ const char* password = "PASSWORD";
 // Cloud iot details.
 const char* project_id = "nagyben";
 const char* location = "europe-west1";
-const char* registry_id = "iot-registry-test";
+const char* registry_id = "iot-registry";
 const char* device_id = "garden1";
 
 // Configuration for NTP
