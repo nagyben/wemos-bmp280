@@ -198,6 +198,9 @@ void bmeSensorJson(DynamicJsonDocument &data)
   data["temp_C"] = bme.readTemperature();
   data["pressure_Pa"] = bme.readPressure();
   data["humidity_%"] = bme.readHumidity();
+#ifdef DEBUG
+  data["debug"] = true;
+#endif
 
   // adding this line causes issues with serial comms
   // no idea why :joy:
