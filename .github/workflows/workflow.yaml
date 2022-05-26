@@ -21,7 +21,12 @@ jobs:
       firestore:
         image: mtlynch/firestore-emulator
         ports:
-        - 8080:8080
+          - 8080:8080
+
+      gcs:
+        image: fsouza/fake-gcs-server
+        ports:
+          - 8090:8090
 
     steps:
     - name: 'Checkout'
