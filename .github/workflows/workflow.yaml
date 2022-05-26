@@ -62,6 +62,7 @@ jobs:
       env:
         FIRESTORE_EMULATOR_HOST: localhost:8080
         FIRESTORE_PROJECT_ID: dummy-firestore-id
+        PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
 
   viz-unit-test:
     name: 'Viz unit test'
