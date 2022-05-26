@@ -27,7 +27,7 @@ jobs:
         image: fsouza/fake-gcs-server
         ports:
           - 8090:8090
-        options: --entrypoint fake-gcs-server -backend memory -port 8090 -scheme http
+        options: --entrypoint "fake-gcs-server -backend memory -port 8090 -scheme http"
 
     steps:
     - name: 'Checkout'
