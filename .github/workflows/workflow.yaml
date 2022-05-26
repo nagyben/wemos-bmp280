@@ -63,6 +63,7 @@ jobs:
         FIRESTORE_EMULATOR_HOST: localhost:8080
         FIRESTORE_PROJECT_ID: dummy-firestore-id
         PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+        GOOGLE_APPLICATION_CREDENTIALS: tests/fake_creds.json
 
   viz-unit-test:
     name: 'Viz unit test'
