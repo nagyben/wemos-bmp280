@@ -1,5 +1,17 @@
 terraform {
-    source = "${get_terragrunt_dir()}/../terraform//app"
+  source = "${get_terragrunt_dir()}/../terraform//app"
+
+  before_hook "export_viz_requirements" {
+    commands = ["plan", "apply"]
+    execute = ["poetry", "export", "--without-hashes", "-o", "requirements.txt"]
+    working_dir = "${get_terragrunt_dir()}/../../cloud_functions/viz"
+  }
+
+  before_hook "export_receiver_requirements" {
+    commands = ["plan", "apply"]
+    execute = ["poetry", "export", "--without-hashes", "-o", "requirements.txt"]
+    working_dir = "${get_terragrunt_dir()}/../../cloud_functions/receiver"
+  }
 }
 
 include "root" {
@@ -8,6 +20,7 @@ include "root" {
 }
 
 inputs = {
-    env_suffix = ""
-    ci_sa = include.root.locals.terraform_service_account
+  env_suffix = ""
+  ci_sa = include.root.locals.terraform_service_account
 }
+
