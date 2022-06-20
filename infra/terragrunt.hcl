@@ -44,6 +44,19 @@ provider "google" {
   ]
 }
 
+provider "google-beta" {
+  project     = var.project
+  region      = "europe-west2"
+}
+
+provider "google-beta" {
+  alias = "impersonation"
+  scopes = [
+    "https://www.googleapis.com/auth/cloud-platform",
+    "https://www.googleapis.com/auth/userinfo.email",
+  ]
+}
+
 data "google_service_account_access_token" "default" {
   provider               = google.impersonation
   target_service_account = var.impersonate_service_account_email
