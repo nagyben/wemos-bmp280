@@ -35,9 +35,9 @@ jobs:
           - 8080:8080
 
       gcs:
-        image: fsouza/fake-gcs-server
+        image: europe-west2-docker.pkg.dev/nagyben/nagyben-cr/fake-gcs
         ports:
-          - 4443:4443
+          - 8090:8090
 
     steps:
     - name: 'Checkout'
@@ -114,7 +114,7 @@ jobs:
       env:
         FIRESTORE_EMULATOR_HOST: localhost:8080
         FIRESTORE_PROJECT_ID: dummy-firestore-id
-        STORAGE_EMULATOR_HOST: https://localhost:4443
+        STORAGE_EMULATOR_HOST: http://localhost:8090
 
   terraform-deploy-test:
     name: 'Deploy test infra'
