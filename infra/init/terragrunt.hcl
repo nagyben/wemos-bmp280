@@ -9,4 +9,5 @@ include "root" {
 
 inputs = {
   ci_sa               = include.root.locals.terraform_service_account
+  location            = "europe-west2"
 }

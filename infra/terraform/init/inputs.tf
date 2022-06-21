@@ -7,3 +7,8 @@ variable "project" {
   type        = string
   description = "The GCP project name"
 }
+
+variable "location" {
+  type        = string
+  description = "The GCP location"
+}
