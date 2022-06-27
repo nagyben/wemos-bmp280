@@ -39,6 +39,11 @@ jobs:
         ports:
           - 8090:8090
 
+        # see https://cloud.google.com/artifact-registry/docs/docker/authentication#json-key
+        credentials:
+          username: _json_key_base64
+          password: ${{ secrets.DOCKER_REGISTRY_KEY_BASE64 }}
+
     steps:
     - name: 'Checkout'
       uses: actions/checkout@v2
