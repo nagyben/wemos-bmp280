@@ -82,7 +82,9 @@ def delete_documents(db: firestore.Client):
 def gcs_client(monkeypatch):
     client = storage.Client(credentials=AnonymousCredentials(), project="test")
     monkeypatch.setattr(viz, "gcs_client", lambda: client)
-    return client
+    yield client
+    for bucket in client.list_buckets():
+        bucket.delete(force=True)
 
 
 def test_load_data(firestore_data, db):
