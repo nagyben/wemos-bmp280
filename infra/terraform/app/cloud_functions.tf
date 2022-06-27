@@ -85,6 +85,11 @@ resource "google_cloudfunctions_function" "viz_function_authenticated" {
   source_archive_bucket = google_storage_bucket.functions_storage_bucket.name
   source_archive_object = google_storage_bucket_object.viz_zip.name
 
+  event_trigger {
+    event_type = "google.pubsub.topic.publish"
+    resource = google_pubsub_topic.pubsub_weather_topic.id
+  }
+
   environment_variables = {
     FIREBASE_COLLECTION = "weather${var.env_suffix}"
   }
