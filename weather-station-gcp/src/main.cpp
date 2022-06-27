@@ -70,7 +70,7 @@ void initWiFi(Config &config) {
   WiFi.persistent(false); // Disable the WiFi persistence.  The ESP8266 will not load and save WiFi settings in the flash memory.
   WiFi.mode(WIFI_STA);
   WiFi.config(IP, GW, MASK, DNS); // need this to speed up wifi connect
-  WiFi.begin(config.ssid, config.password, CHANNEL, MAC, true);
+  WiFi.begin(config.ssid, config.password);
   DEBUG_PRINT(F("Connecting to WiFi .."));
   while (WiFi.status() != WL_CONNECTED)
   {
