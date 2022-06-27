@@ -125,6 +125,10 @@ jobs:
       run: |
         curl http://localhost:8090/storage/v1/b
 
+    - name: Dump docker logs on failure
+      if: failure()
+      uses: jwalton/gh-docker-logs@v1
+
   terraform-deploy-test:
     name: 'Deploy test infra'
     uses: nagyben/wemos-bmp280/.github/workflows/deploy.yaml@master
