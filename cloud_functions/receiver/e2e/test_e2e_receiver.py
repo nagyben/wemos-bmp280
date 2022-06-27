@@ -33,6 +33,8 @@ def test_mqtt(db):
 
     topic_path = publisher.topic_path(PROJECT_ID, TOPIC_NAME)
 
+    print(f"Topic path: {topic_path}")
+
     new_doc = {"data": "test-e2e"}
     message_json = json.dumps(new_doc)
     message_bytes = message_json.encode("utf-8")
