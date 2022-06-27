@@ -71,17 +71,14 @@ jobs:
         mypy --strict .
       working-directory: cloud_functions/receiver
 
-    - name: curl fake gcs
+    - name: 'pytest'
       run: |
-        curl http://localhost:8090/storage/v1/b
-    # - name: 'pytest'
-    #   run: |
-    #     python -m pytest tests/
-    #   working-directory: cloud_functions/receiver
-    #   env:
-    #     FIRESTORE_EMULATOR_HOST: localhost:8080
-    #     FIRESTORE_PROJECT_ID: dummy-firestore-id
-    #     PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+        python -m pytest tests/
+      working-directory: cloud_functions/receiver
+      env:
+        FIRESTORE_EMULATOR_HOST: localhost:8080
+        FIRESTORE_PROJECT_ID: dummy-firestore-id
+        PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
 
   viz-unit-test:
     name: 'Viz unit test'
@@ -115,14 +112,18 @@ jobs:
         mypy --strict .
       working-directory: cloud_functions/viz
 
-    - name: 'pytest'
+    # - name: 'pytest'
+    #   run: |
+    #     python -m pytest tests/
+    #   working-directory: cloud_functions/viz
+    #   env:
+    #     FIRESTORE_EMULATOR_HOST: localhost:8080
+    #     FIRESTORE_PROJECT_ID: dummy-firestore-id
+    #     STORAGE_EMULATOR_HOST: http://localhost:8090
+
+    - name: curl fake gcs
       run: |
-        python -m pytest tests/
-      working-directory: cloud_functions/viz
-      env:
-        FIRESTORE_EMULATOR_HOST: localhost:8080
-        FIRESTORE_PROJECT_ID: dummy-firestore-id
-        STORAGE_EMULATOR_HOST: http://localhost:8090
+        curl http://localhost:8090/storage/v1/b
 
   terraform-deploy-test:
     name: 'Deploy test infra'
