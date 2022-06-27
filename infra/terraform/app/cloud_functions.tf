@@ -11,7 +11,7 @@ locals {
 data "archive_file" "receiver_source" {
   type        = "zip"
   source_dir  = "${local.root_dir}/receiver"
-  output_path = "/tmp/function.zip"
+  output_path = "/tmp/receiver.zip"
   excludes = concat(
     tolist(fileset(path.module, "../../../../../../cloud_functions/e2e/**")),
     tolist(fileset(path.module, "../../../../../../cloud_functions/tests/**")),
@@ -61,7 +61,7 @@ resource "google_cloudfunctions_function_iam_member" "receiver_function_authenti
 data "archive_file" "viz_source" {
   type        = "zip"
   source_dir  = "${local.root_dir}/viz"
-  output_path = "/tmp/function.zip"
+  output_path = "/tmp/viz.zip"
   excludes = concat(
     tolist(fileset(path.module, "../../../../../../cloud_functions/e2e/**")),
     tolist(fileset(path.module, "../../../../../../cloud_functions/tests/**")),
