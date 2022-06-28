@@ -181,7 +181,7 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: 'tf output'
-      run: terragrunt output -json > tfoutput.json
+      run: terragrunt output -json > /tmp/tfoutput.json
       working-directory: infra/app-test
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
@@ -251,7 +251,7 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: 'tg output'
-      run: terraform-bin output -json > tfoutput.json
+      run: terraform-bin output -json > /tmp/tfoutput.json
       working-directory: infra/app-test
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
@@ -259,7 +259,7 @@ jobs:
     - name: 'pytest'
       run: |
         echo $GOOGLE_CREDENTIALS > /tmp/creds.json
-        export URL=$(jq -r ".viz_url.value" ../terraform/tfoutput.json)
+        export URL=$(jq -r ".viz_url.value" /tmp/tfoutput.json)
         python -m pytest e2e/
       working-directory: cloud_functions/viz
       env:
