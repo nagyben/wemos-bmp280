@@ -13,15 +13,16 @@ data "archive_file" "receiver_source" {
   source_dir  = "${local.root_dir}/receiver"
   output_path = "/tmp/receiver.zip"
   excludes = concat(
-    tolist(fileset(path.module, "../../../../../../cloud_functions/e2e/**")),
-    tolist(fileset(path.module, "../../../../../../cloud_functions/tests/**")),
-    tolist(fileset(path.module, "../../../../../../cloud_functions/.pytest_cache/**"))
+    tolist(fileset(path.module, "../../../cloud_functions/receiver/e2e/**")),
+    tolist(fileset(path.module, "../../../cloud_functions/receiver/tests/**")),
+    tolist(fileset(path.module, "../../../cloud_functions/receiver/.pytest_cache/**")),
+    tolist(fileset(path.module, "../../../cloud_functions/receiver/Makefile**"))
   )
 }
 
 resource "google_storage_bucket_object" "receiver_zip" {
   # Append file MD5 to force object to be recreated
-  name     = "function${var.env_suffix}-${data.archive_file.receiver_source.output_md5}.zip"
+  name     = "receiver${var.env_suffix}-${data.archive_file.receiver_source.output_md5}.zip"
   bucket   = google_storage_bucket.functions_storage_bucket.name
   source   = data.archive_file.receiver_source.output_path
   # metadata = {}
@@ -63,15 +64,16 @@ data "archive_file" "viz_source" {
   source_dir  = "${local.root_dir}/viz"
   output_path = "/tmp/viz.zip"
   excludes = concat(
-    tolist(fileset(path.module, "../../../../../../cloud_functions/e2e/**")),
-    tolist(fileset(path.module, "../../../../../../cloud_functions/tests/**")),
-    tolist(fileset(path.module, "../../../../../../cloud_functions/.pytest_cache/**"))
+    tolist(fileset(path.module, "../../../cloud_functions/viz/e2e/**")),
+    tolist(fileset(path.module, "../../../cloud_functions/viz/tests/**")),
+    tolist(fileset(path.module, "../../../cloud_functions/viz/.pytest_cache/**")),
+    tolist(fileset(path.module, "../../../cloud_functions/viz/Makefile**"))
   )
 }
 
 resource "google_storage_bucket_object" "viz_zip" {
   # Append file MD5 to force object to be recreated
-  name     = "function${var.env_suffix}-${data.archive_file.viz_source.output_md5}.zip"
+  name     = "viz${var.env_suffix}-${data.archive_file.viz_source.output_md5}.zip"
   bucket   = google_storage_bucket.functions_storage_bucket.name
   source   = data.archive_file.viz_source.output_path
   # metadata = {}
