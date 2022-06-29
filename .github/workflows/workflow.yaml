@@ -251,7 +251,7 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: 'tg output'
-      run: terraform-bin output -json > /tmp/tfoutput.json
+      run: terragrunt output -json > /tmp/tfoutput.json
       working-directory: infra/app-test
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
