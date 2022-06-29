@@ -169,10 +169,11 @@ jobs:
       with:
         terraform_wrapper: false
 
-    - name: Setup Terragrunt
-      uses: autero1/action-terragrunt@v1.1.0
+    - name: 'install tf'
+      uses: hashicorp/setup-terraform@v1
       with:
-        terragrunt_version: latest
+        # https://stackoverflow.com/questions/71462777/parse-error-when-trying-to-parse-terraform-output-in-github-actions-workflow-wit
+        terraform_wrapper: false
 
     - name: 'tf init'
       run: terragrunt init
@@ -243,6 +244,9 @@ jobs:
 
     - name: 'install tf'
       uses: hashicorp/setup-terraform@v1
+      with:
+        # https://stackoverflow.com/questions/71462777/parse-error-when-trying-to-parse-terraform-output-in-github-actions-workflow-wit
+        terraform_wrapper: false
 
     - name: Setup Terragrunt
       uses: autero1/action-terragrunt@v1.1.0
