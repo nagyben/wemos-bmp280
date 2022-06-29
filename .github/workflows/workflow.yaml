@@ -244,8 +244,13 @@ jobs:
     - name: 'install tf'
       uses: hashicorp/setup-terraform@v1
 
+    - name: Setup Terragrunt
+      uses: autero1/action-terragrunt@v1.1.0
+      with:
+        terragrunt_version: latest
+
     - name: 'tg init'
-      run: terraform init
+      run: terragrunt init
       working-directory: infra/app-test
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
