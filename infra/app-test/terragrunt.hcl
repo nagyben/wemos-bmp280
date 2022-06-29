@@ -2,13 +2,13 @@ terraform {
   source = "${get_terragrunt_dir()}/../terraform//app"
 
   before_hook "export_viz_requirements" {
-    commands = ["apply"]
+    commands = ["plan", "apply"]
     execute = ["poetry", "export", "--without-hashes", "-o", "requirements.txt"]
     working_dir = "${get_terragrunt_dir()}/../../cloud_functions/viz"
   }
 
   before_hook "export_receiver_requirements" {
-    commands = ["apply"]
+    commands = ["plan", "apply"]
     execute = ["poetry", "export", "--without-hashes", "-o", "requirements.txt"]
     working_dir = "${get_terragrunt_dir()}/../../cloud_functions/receiver"
   }
