@@ -11,5 +11,5 @@ output "topic_name" {
 }
 
 output "viz_url" {
-  value = google_storage_bucket.static_site.name
+  value = "http://${google_storage_bucket.static_site.name}"
 }
