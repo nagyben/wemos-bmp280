@@ -10,6 +10,6 @@ output "topic_name" {
   value = google_pubsub_topic.pubsub_weather_topic.name
 }
 
-output "static_site_url" {
-  value = google_storage_bucket.static_site.url
+output "viz_url" {
+  value = google_storage_bucket.static_site.name
 }

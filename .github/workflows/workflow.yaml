@@ -266,7 +266,6 @@ jobs:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/creds.json
-        URL: http://weather-test.exantas.me
 
   terraform-deploy-prod:
     name: 'Deploy prod infra'
