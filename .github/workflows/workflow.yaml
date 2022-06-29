@@ -181,7 +181,7 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: 'tf output'
-      run: terragrunt output -json > /tmp/tfoutput.json
+      run: terragrunt output -json > ~/tfoutput.json
       working-directory: infra/app-test
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
@@ -202,7 +202,7 @@ jobs:
         POETRY_VIRTUALENVS_CREATE: false
       working-directory: cloud_functions/receiver
 
-    - run: echo $GOOGLE_CREDENTIALS > /tmp/creds.json
+    - run: echo $GOOGLE_CREDENTIALS > ~/creds.json
       name: write creds to file
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
@@ -211,13 +211,13 @@ jobs:
     - name: Test with pytest
       run: |
         set -euo pipefail
-        export RECEIVER_URL=$(jq -r .receiver_url.value /tmp/tfoutput.json)
-        export TOPIC_NAME=$(jq -r .topic_name.value /tmp/tfoutput.json)
+        export RECEIVER_URL=$(jq -r .receiver_url.value ~/tfoutput.json)
+        export TOPIC_NAME=$(jq -r .topic_name.value ~/tfoutput.json)
         pytest e2e/
       working-directory: cloud_functions/receiver
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
-        GOOGLE_APPLICATION_CREDENTIALS: /tmp/creds.json
+        GOOGLE_APPLICATION_CREDENTIALS: ~/creds.json
 
   viz-e2e:
     name: viz-e2e
@@ -256,21 +256,24 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: 'tg output'
-      run: terragrunt output -json > /tmp/tfoutput.json
+      run: |
+        terragrunt output -json > ~/tfoutput.json
+        cat ~/tfoutput.json
       working-directory: infra/app-test
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: 'pytest'
       run: |
-        echo $GOOGLE_CREDENTIALS > /tmp/creds.json
-        export URL=$(jq -r ".viz_url.value" /tmp/tfoutput.json)
+        echo $GOOGLE_CREDENTIALS > ~/creds.json
+        jq -r ".viz_url.value" ~/tfoutput.json
+        export URL=$(jq -r ".viz_url.value" ~/tfoutput.json)
         python -m pytest e2e/
       working-directory: cloud_functions/viz
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-        GOOGLE_APPLICATION_CREDENTIALS: /tmp/creds.json
+        GOOGLE_APPLICATION_CREDENTIALS: ~/creds.json
 
   terraform-deploy-prod:
     name: 'Deploy prod infra'
