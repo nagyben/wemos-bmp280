@@ -215,6 +215,7 @@ jobs:
         export RECEIVER_URL=$(jq -r .receiver_url.value /tmp/tfoutput.json)
         export TOPIC_NAME=$(jq -r .topic_name.value /tmp/tfoutput.json)
         export URL=$(jq -r ".viz_url.value" /tmp/tfoutput.json)
+        export STATIC_SITE_BUCKET=$(jq -r ".static_site_bucket_name.value" /tmp/tfoutput.json)
         python -m pytest .
       working-directory: cloud_functions/e2e
       env:

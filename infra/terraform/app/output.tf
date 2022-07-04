@@ -13,3 +13,7 @@ output "topic_name" {
 output "viz_url" {
   value = "http://${google_storage_bucket.static_site.name}"
 }
+
+output "static_site_bucket_name" {
+  value = google_storage_bucket.static_site.name
+}
