@@ -114,6 +114,7 @@ def update() -> None:
 
     bucket = client.bucket(os.environ["STATIC_SITE_BUCKET"])
     blob = bucket.blob("index.html")
+    blob.metadata = {"contentType": "text/html", "cacheControl": "no-cache"}
     blob.upload_from_string(html)
 
 
