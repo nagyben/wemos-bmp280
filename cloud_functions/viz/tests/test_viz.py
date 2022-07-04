@@ -14,6 +14,7 @@ from google.cloud import firestore, storage
 import viz
 
 FIREBASE_COLLECTION = "weather-test"
+STATIC_SITE_BUCKET = "test.weather.com"
 
 
 @pytest.fixture(scope="session")
@@ -82,6 +83,7 @@ def delete_documents(db: firestore.Client):
 def gcs_client(monkeypatch):
     client = storage.Client(credentials=AnonymousCredentials(), project="test")
     monkeypatch.setattr(viz, "gcs_client", lambda: client)
+    monkeypatch.setenv("STATIC_SITE_BUCKET", STATIC_SITE_BUCKET)
     yield client
     for bucket in client.list_buckets():
         bucket.delete(force=True)
@@ -131,7 +133,7 @@ def test_load_multiple_data(db):
 
 
 def test_update_uploads_output_to_bucket(gcs_client, db, firestore_data):
-    bucket = gcs_client.create_bucket("bucket")
+    bucket = gcs_client.create_bucket(STATIC_SITE_BUCKET)
 
     data = firestore_data.to_dict(orient="records")
     db.collection(FIREBASE_COLLECTION).document("20210101").set(

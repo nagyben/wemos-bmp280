@@ -107,10 +107,8 @@ def test_viz_e2e(db, firestore_data):
 
     print(f"Topic path: {topic_path}")
 
-    data = {
-        "date": "2020-01-01",
-        "data": firestore_data.to_dict(orient="records"),
-    }
+    data = firestore_data.iloc[-1].to_dict()
+    print(data)
     message_json = json.dumps(data)
     message_bytes = message_json.encode("utf-8")
     publish_future = publisher.publish(topic_path, data=message_bytes)
