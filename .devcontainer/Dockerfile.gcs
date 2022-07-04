@@ -1,0 +1,6 @@
+FROM fsouza/fake-gcs-server:1.38.0
+
+ENTRYPOINT ["/bin/fake-gcs-server", \
+"-scheme", "http", \
+"-backend", "memory", \
+"-port", "8090" ]
