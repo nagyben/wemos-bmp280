@@ -13,10 +13,10 @@ data "archive_file" "receiver_source" {
   source_dir  = "${local.root_dir}/receiver"
   output_path = "/tmp/receiver.zip"
   excludes = concat(
-    tolist(fileset("${local.root_dir}", "receiver/e2e/**")),
-    tolist(fileset("${local.root_dir}", "receiver/tests/**")),
-    tolist(fileset("${local.root_dir}", "receiver/.pytest_cache/**")),
-    tolist(fileset("${local.root_dir}", "receiver/Makefile**"))
+    tolist(fileset(local.root_dir, "receiver/e2e/**")),
+    tolist(fileset(local.root_dir, "receiver/tests/**")),
+    tolist(fileset(local.root_dir, "receiver/.pytest_cache/**")),
+    tolist(fileset(local.root_dir, "receiver/Makefile**"))
   )
 }
 
@@ -64,10 +64,10 @@ data "archive_file" "viz_source" {
   source_dir  = "${local.root_dir}/viz"
   output_path = "/tmp/viz.zip"
   excludes = concat(
-    tolist(fileset("${local.root_dir}", "viz/e2e/**")),
-    tolist(fileset("${local.root_dir}", "viz/tests/**")),
-    tolist(fileset("${local.root_dir}", "viz/.pytest_cache/**")),
-    tolist(fileset("${local.root_dir}", "viz/Makefile**"))
+    tolist(fileset(local.root_dir, "viz/e2e/**")),
+    tolist(fileset(local.root_dir, "viz/tests/**")),
+    tolist(fileset(local.root_dir, "viz/.pytest_cache/**")),
+    tolist(fileset(local.root_dir, "viz/Makefile**"))
   )
 }
 
