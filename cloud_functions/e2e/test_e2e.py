@@ -61,7 +61,7 @@ def static_site_bucket():
     for bucket in client.list_buckets():
         bucket.delete_blobs(bucket.list_blobs())
 
-def test_receiver_e2e(db):
+def test_receiver_e2e(db, firestore_data):
     # Instantiates a Pub/Sub client
     publisher = pubsub_v1.PublisherClient()
 
@@ -69,12 +69,8 @@ def test_receiver_e2e(db):
 
     print(f"Topic path: {topic_path}")
 
-    new_doc = {"data": "test-e2e"}
-    message_json = json.dumps(new_doc)
+    message_json = firestore_data.iloc[-1].to_json(orient="records")
     message_bytes = message_json.encode("utf-8")
-
-    # delete test db contents
-    delete_documents(db)
 
     # Publishes a message
     publish_future = publisher.publish(topic_path, data=message_bytes)
@@ -87,8 +83,6 @@ def test_receiver_e2e(db):
     try:
         actual = next(docs).to_dict()
         print(actual)
-        assert "data" in actual
-        assert "data" in actual["data"][0]
     except StopIteration:
         raise LookupError(f"Could not find any records in {FIREBASE_COLLECTION}")
 
