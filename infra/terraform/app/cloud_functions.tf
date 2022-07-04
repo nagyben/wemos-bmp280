@@ -94,6 +94,7 @@ resource "google_cloudfunctions_function" "viz_function_authenticated" {
 
   environment_variables = {
     FIREBASE_COLLECTION = "weather${var.env_suffix}"
+    STATIC_SITE_BUCKET  = google_storage_bucket.static_site.name
   }
 
   entry_point           = "viz_function"
