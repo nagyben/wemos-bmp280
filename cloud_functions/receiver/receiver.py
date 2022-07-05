@@ -48,7 +48,8 @@ def receiver(event: Any, context: Any) -> str:
     logging.debug(context)
     logging.debug(event)
     mqtt_message = base64.b64decode(event["data"]).decode("utf-8")
-    logging.debug(mqtt_message)
+    logging.debug(json.dumps(mqtt_message))
+    print(mqtt_message)
 
     # return "OK"
 
