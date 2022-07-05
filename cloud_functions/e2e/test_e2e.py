@@ -53,6 +53,7 @@ def delete_documents(db: firestore.Client):
     for doc in docs:
         doc.reference.delete()
 
+
 @pytest.fixture
 def static_site_bucket():
     client = storage.Client()
@@ -60,6 +61,7 @@ def static_site_bucket():
     yield bucket
     for bucket in client.list_buckets():
         bucket.delete_blobs(bucket.list_blobs())
+
 
 def test_receiver_e2e(db, firestore_data):
     # Instantiates a Pub/Sub client
@@ -69,7 +71,8 @@ def test_receiver_e2e(db, firestore_data):
 
     print(f"Topic path: {topic_path}")
 
-    message_json = firestore_data.iloc[-1].to_json(orient="records")
+    data = firestore_data.iloc[-1].to_dict()
+    message_json = json.dumps(data)
     message_bytes = message_json.encode("utf-8")
 
     # Publishes a message
@@ -113,5 +116,3 @@ def test_viz_e2e(db, firestore_data):
     # assert viz page is available
     response = requests.get(URL)
     assert response.status_code == 200
-
-
