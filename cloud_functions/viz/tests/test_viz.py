@@ -132,7 +132,7 @@ def test_load_multiple_data(db):
     pandas.testing.assert_frame_equal(expected, df, check_like=True)
 
 
-def test_update_uploads_output_to_bucket(gcs_client, db, firestore_data):
+def test_update_uploads_output_to_bucket_with_metadata(gcs_client, db, firestore_data):
     bucket = gcs_client.create_bucket(STATIC_SITE_BUCKET)
 
     data = firestore_data.to_dict(orient="records")
@@ -148,5 +148,5 @@ def test_update_uploads_output_to_bucket(gcs_client, db, firestore_data):
     assert bucket.blob("index.html").exists()
 
     metadata = bucket.get_blob("index.html").metadata
-    assert metadata["contentType"] == "text/html"
-    assert metadata["cacheControl"] == "no-cache"
+    assert metadata["Content-Type"] == "text/html"
+    assert metadata["Cache-Control"] == "no-cache"
