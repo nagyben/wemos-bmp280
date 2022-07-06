@@ -19,5 +19,11 @@ RUN wget https://github.com/gruntwork-io/terragrunt/releases/download/v0.38.0/te
     && mv terragrunt_linux_amd64 /usr/local/bin/terragrunt \
     && chmod +x /usr/local/bin/terragrunt
 
+RUN wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-392.0.0-linux-x86_64.tar.gz \
+    && tar -xf google-cloud-cli-392.0.0-linux-x86_64.tar.gz \
+    && mv google-cloud-sdk /home/vscode/google-cloud-sdk \
+    && chown -R vscode:vscode /home/vscode/google-cloud-sdk
+
+
 # [Optional] Uncomment this line to install global node packages.
 # RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
