@@ -2,10 +2,12 @@
 #ifdef DEBUG
 #define DEBUG_PRINT(x) Serial.print(x)
 #define DEBUG_PRINTLN(x) Serial.println(x)
+#define DEBUG_PRINTF(...) Serial.printf(__VA_ARGS__)
 #define BLINK(x) blink(x)
 #else
 #define DEBUG_PRINT(x)
 #define DEBUG_PRINTLN(x)
+#define DEBUG_PRINTF(...)
 #define BLINK(x)
 #endif
 
@@ -64,14 +66,81 @@ inline void deepSleep() {
   ESP.deepSleep(DEEPSLEEP_TIME, WAKE_RF_DISABLED);
 }
 
+const char* connectionStatus(int);
+
+void eventWiFi(WiFiEvent_t event) {
+  switch(event) {
+  case WIFI_EVENT_STAMODE_CONNECTED:
+    DEBUG_PRINTF("[wifi] %d, Connected\n", event);
+    break;
+
+  case WIFI_EVENT_STAMODE_DISCONNECTED:
+    DEBUG_PRINTF("[wifi] %d, Disconnected - Status %d, %s\n", event, WiFi.status(), connectionStatus(WiFi.status()));
+    break;
+
+  case WIFI_EVENT_STAMODE_AUTHMODE_CHANGE:
+    DEBUG_PRINTF("[wifi] %d, AuthMode Change\n", event);
+    break;
+
+  case WIFI_EVENT_STAMODE_GOT_IP:
+    DEBUG_PRINTF("[wifi] %d, Got IP\n", event);
+    break;
+
+  case WIFI_EVENT_STAMODE_DHCP_TIMEOUT:
+    DEBUG_PRINTF("[wifi] %d, DHCP Timeout\n", event);
+    break;
+
+  case WIFI_EVENT_SOFTAPMODE_STACONNECTED:
+    DEBUG_PRINTF("[ap] %d, Client Connected\n", event);
+    break;
+
+  case WIFI_EVENT_SOFTAPMODE_STADISCONNECTED:
+    DEBUG_PRINTF("[ap] %d, Client Disconnected\n", event);
+    break;
+
+  case WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED:
+    DEBUG_PRINTF("[ap] %d, Probe Request Recieved\n", event);
+    break;
+
+  default:
+    DEBUG_PRINTF("[GENERIC EVENT] %d\n", event);
+  }
+}
+
+const char* connectionStatus(int status) {
+  switch(status) {
+  case WL_CONNECTED:
+    return "Connected";
+
+  case WL_NO_SSID_AVAIL:
+    return "Network not availible";
+
+  case WL_CONNECT_FAILED:
+    return "Wrong password";
+
+  case WL_IDLE_STATUS:
+    return "Idle status";
+
+  case WL_DISCONNECTED:
+    return "Disconnected";
+
+  default:
+    return "Unknown";
+  }
+}
+
 void initWiFi(Config &config) {
+  WiFi.onEvent(eventWiFi);
   WiFi.forceSleepWake();
   yield();                // IMPORTANT!
   WiFi.persistent(false); // Disable the WiFi persistence.  The ESP8266 will not load and save WiFi settings in the flash memory.
   WiFi.mode(WIFI_STA);
   WiFi.config(IP, GW, MASK, DNS); // need this to speed up wifi connect
+  DEBUG_PRINTLN(config.ssid);
+  DEBUG_PRINTLN(config.password);
   WiFi.begin(config.ssid, config.password);
-  DEBUG_PRINT(F("Connecting to WiFi .."));
+  DEBUG_PRINT(F("Connecting to WiFi with SSID: ")); DEBUG_PRINT(config.ssid);
+  HEAP; STACK;
   while (WiFi.status() != WL_CONNECTED)
   {
     DEBUG_PRINT('.');
