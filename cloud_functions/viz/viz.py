@@ -114,8 +114,8 @@ def update() -> None:
 
     bucket = client.bucket(os.environ["STATIC_SITE_BUCKET"])
     blob = bucket.blob("index.html")
-    blob.metadata = {"Content-Type": "text/html", "Cache-Control": "no-cache"}
-    blob.upload_from_string(html)
+    blob.cache_control = "no-cache"
+    blob.upload_from_string(html, content_type="text/html")
 
 
 def gcs_client() -> storage.Client:

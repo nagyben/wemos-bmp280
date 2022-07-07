@@ -147,6 +147,6 @@ def test_update_uploads_output_to_bucket_with_metadata(gcs_client, db, firestore
 
     assert bucket.blob("index.html").exists()
 
-    metadata = bucket.get_blob("index.html").metadata
-    assert metadata["Content-Type"] == "text/html"
-    assert metadata["Cache-Control"] == "no-cache"
+    blob = bucket.get_blob("index.html")
+    assert blob.content_type == "text/html"
+    assert blob.cache_control == "no-cache"
