@@ -128,18 +128,14 @@ jobs:
         mypy --strict .
       working-directory: cloud_functions/viz
 
-    # - name: 'pytest'
-    #   run: |
-    #     python -m pytest tests/
-    #   working-directory: cloud_functions/viz
-    #   env:
-    #     FIRESTORE_EMULATOR_HOST: localhost:8080
-    #     FIRESTORE_PROJECT_ID: dummy-firestore-id
-    #     STORAGE_EMULATOR_HOST: http://localhost:8090
-
-    - name: curl fake gcs
+    - name: 'pytest'
       run: |
-        curl http://localhost:8090/storage/v1/b
+        python -m pytest tests/
+      working-directory: cloud_functions/viz
+      env:
+        FIRESTORE_EMULATOR_HOST: localhost:8080
+        FIRESTORE_PROJECT_ID: dummy-firestore-id
+        STORAGE_EMULATOR_HOST: http://localhost:8090
 
     - name: Dump docker logs on failure
       if: failure()
