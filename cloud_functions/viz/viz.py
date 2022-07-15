@@ -21,7 +21,7 @@ def render() -> str:
     fig_html = _render_plotly_html(fig)
     return template.render(
         chart_html=fig_html,
-        **df.iloc[-1].to_dict(),  # nice
+        **df.iloc[-1].to_dict(),  # nice
     )
 
 
