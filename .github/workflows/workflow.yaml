@@ -137,6 +137,16 @@ jobs:
         FIRESTORE_PROJECT_ID: dummy-firestore-id
         STORAGE_EMULATOR_HOST: http://localhost:8090
 
+    - name: 'install playwright'
+      run: |
+        playwright install
+      working-directory: cloud_functions/viz
+
+    - name: 'UI tests'
+      run: |
+        python -m pytest ui_tests/
+      working-directory: cloud_functions/viz
+
     - name: Dump docker logs on failure
       if: failure()
       uses: jwalton/gh-docker-logs@v1

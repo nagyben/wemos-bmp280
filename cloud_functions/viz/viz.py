@@ -19,7 +19,10 @@ def render() -> str:
     df = load_data()
     fig = _create_figure(df)
     fig_html = _render_plotly_html(fig)
-    return template.render(chart_html=fig_html)
+    return template.render(
+        chart_html=fig_html,
+        **df.iloc[-1].to_dict(),  # nice
+    )
 
 
 def load_data() -> pandas.DataFrame:
