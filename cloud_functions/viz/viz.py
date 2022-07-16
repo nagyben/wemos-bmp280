@@ -1,6 +1,6 @@
 import datetime
 import os
-from typing import Any
+from typing import Any, Dict
 
 import jinja2
 import pandas
@@ -21,8 +21,17 @@ def render() -> str:
     fig_html = _render_plotly_html(fig)
     return template.render(
         chart_html=fig_html,
-        **df.iloc[-1].to_dict(),  # nice
+        **_inject_data_into_template(df)
     )
+
+
+
+def _inject_data_into_template(df: pandas.DataFrame) -> Dict[str, Any]:
+    df["pressure_mbar"] = df["pressure_Pa"] / 100
+    df = df.rename(columns={"humidity_%": "humidity"})
+    return df.iloc[-1].to_dict()
+
+
 
 
 def load_data() -> pandas.DataFrame:

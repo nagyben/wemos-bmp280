@@ -9,6 +9,12 @@
     <div id="temp_C">
         <h1>{{ "%.1f"|format(temp_C) }} &deg;C</h1>
     </div>
+    <div id="humidity">
+        <h1>{{ "%.0f"|format(humidity) }}%</h1>
+    </div>
+    <div id="pressure">
+        <h1>{{ "%.0f"|format(pressure_mbar) }} mbar</h1>
+    </div>
     <div id="chart">
         {{chart_html | safe}}
     </div>
