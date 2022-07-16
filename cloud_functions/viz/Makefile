@@ -6,6 +6,10 @@ test:
 test-s:
 	poetry run python -m pytest tests/ -s
 
+.PHONY: test-ui
+test-ui:
+	poetry run python -m pytest ui_tests/
+
 .PHONY: install
 install:
 	poetry install
