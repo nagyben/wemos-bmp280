@@ -19,19 +19,13 @@ def render() -> str:
     df = load_data()
     fig = _create_figure(df)
     fig_html = _render_plotly_html(fig)
-    return template.render(
-        chart_html=fig_html,
-        **_inject_data_into_template(df)
-    )
-
+    return template.render(chart_html=fig_html, **_inject_data_into_template(df))
 
 
 def _inject_data_into_template(df: pandas.DataFrame) -> Dict[str, Any]:
     df["pressure_mbar"] = df["pressure_Pa"] / 100
     df = df.rename(columns={"humidity_%": "humidity"})
     return df.iloc[-1].to_dict()
-
-
 
 
 def load_data() -> pandas.DataFrame:

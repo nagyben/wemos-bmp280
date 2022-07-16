@@ -72,6 +72,7 @@ def test_renders_humidity(index_page, firestore_data):
         f'{firestore_data.iloc[-1].loc["humidity_%"]:.0f}%', timeout=500
     )
 
+
 def test_renders_pressure(index_page, firestore_data):
     expect(index_page.locator("#pressure h1")).to_have_text(
         f'{firestore_data.iloc[-1].loc["pressure_Pa"]/100:.0f} mbar', timeout=500
