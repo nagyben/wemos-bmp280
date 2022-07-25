@@ -25,7 +25,7 @@ def render() -> str:
 def _inject_data_into_template(df: pandas.DataFrame) -> Dict[str, Any]:
     df["pressure_mbar"] = df["pressure_Pa"] / 100
     df = df.rename(columns={"humidity_%": "humidity"})
-    return df.iloc[-1].to_dict()
+    return df.iloc[-1].to_dict()  # type: ignore
 
 
 def load_data() -> pandas.DataFrame:
