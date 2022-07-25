@@ -17,9 +17,19 @@ env = jinja2.Environment(
 def render() -> str:
     template = env.get_template("viz.html")
     df = load_data()
+    df = preprocess(df)
     fig = _create_figure(df)
     fig_html = _render_plotly_html(fig)
     return template.render(chart_html=fig_html, **_inject_data_into_template(df))
+
+
+def preprocess(df: pandas.DataFrame) -> pandas.DataFrame:
+    df["timestamp"] = pandas.to_datetime(df["timestamp"], utc=True)
+    df = df.loc[
+        df["timestamp"]
+        > datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=30)
+    ]
+    return df
 
 
 def _inject_data_into_template(df: pandas.DataFrame) -> Dict[str, Any]:

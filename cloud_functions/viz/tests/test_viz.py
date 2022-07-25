@@ -17,13 +17,18 @@ FIREBASE_COLLECTION = "weather-test"
 STATIC_SITE_BUCKET = "test.weather.com"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def firestore_data():
+    DAYS = 60
     return pandas.DataFrame(
         [
             {
                 "key": numpy.nan,
-                "timestamp": datetime.datetime(2020, 1, 1, 12, i * 5).isoformat(),
+                "timestamp": (
+                    datetime.datetime.today()
+                    - datetime.timedelta(days=DAYS)
+                    + datetime.timedelta(days=i)
+                ).isoformat(),
                 "humidity_%": 62.50879,
                 "wifiConnecTime_ms": numpy.nan,
                 "pressure_Pa": 98756.16,
@@ -35,7 +40,7 @@ def firestore_data():
                 "postGcpToken_ms": 13631.0,
                 "postConnectTime_ms": 6397.0,
             }
-            for i in range(10)
+            for i in range(DAYS)
         ]
     )
 
