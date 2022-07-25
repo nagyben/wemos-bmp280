@@ -110,10 +110,18 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
         start_cell="bottom-left",
     )
 
+    fig.update_yaxes(visible=False)
+    fig.update_xaxes(showgrid=False)
+
     for trace in traces:
         fig.add_trace(trace)
 
-    fig.update_layout(template="none", hovermode="x")
+    fig.update_layout(
+        template="none",
+        hovermode="x",
+        legend=dict(orientation="h"),
+        height=600,
+    )
 
     return fig
 
