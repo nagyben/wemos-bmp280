@@ -68,7 +68,7 @@ def index_page(mock_load_data, firestore_data):
 
 def test_renders_temperature(index_page, firestore_data):
     expect(index_page.locator("#temp_C h1")).to_have_text(
-        f'{firestore_data.iloc[-1].loc["temp_C"]:.1f} \xb0C', timeout=500
+        f'{firestore_data.iloc[-1].loc["temp_C"]:.0f}\xb0C', timeout=500
     )
 
 
@@ -80,7 +80,7 @@ def test_renders_humidity(index_page, firestore_data):
 
 def test_renders_pressure(index_page, firestore_data):
     expect(index_page.locator("#pressure h1")).to_have_text(
-        f'{firestore_data.iloc[-1].loc["pressure_Pa"]/100:.0f} mbar', timeout=500
+        f'{firestore_data.iloc[-1].loc["pressure_Pa"]/100:.0f}mbar', timeout=500
     )
 
 
