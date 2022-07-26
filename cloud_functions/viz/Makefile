@@ -22,6 +22,6 @@ format:
 lint:
 	poetry run mypy --strict . && poetry run black --check . && poetry run isort --check .
 
-.PHONY: show-output
-show-output:
-	python -m webbrowser -t "test.html"
+.PHONY: run
+run:
+	poetry run python test_server.py
