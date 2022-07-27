@@ -1,6 +1,7 @@
 import base64
 import datetime
 import json
+import logging
 import os
 import unittest.mock as mock
 
@@ -16,8 +17,9 @@ import receiver
 
 
 @pytest.fixture(autouse=True)
-def logging(monkeypatch):
+def mock_cloudlogging(monkeypatch, caplog):
     monkeypatch.setattr(receiver, "cloudlogging", mock.MagicMock())
+    caplog.set_level(logging.DEBUG)
 
 
 @pytest.fixture(scope="module")
@@ -112,3 +114,31 @@ def test_adds_entry_to_existing_entries_on_same_day(firebase, db, empty_db):
     print(actual_doc.to_dict())
     print(expected_doc)
     assert actual_doc.to_dict() == expected_doc
+
+
+def test_receiver_handles_event_messages(firebase, db, empty_db):
+    data = {"key": "value"}
+    db.collection("weather-test").document("20200101").set(
+        {
+            "date": "2020-01-01",
+            "data": [
+                {"timestamp": datetime.datetime(2020, 1, 1, 0, 0).isoformat(), **data},
+                {"timestamp": datetime.datetime(2020, 1, 1, 0, 5).isoformat(), **data},
+                {"timestamp": datetime.datetime(2020, 1, 1, 0, 10).isoformat(), **data},
+            ],
+        }
+    )
+
+    data = "garden1-connected"
+    context = {
+        "herp": "derp",
+        "event_id": "event_id",
+        "timestamp": datetime.datetime.now().isoformat(),
+        "resource": {"name": "herp"},
+        "data": base64.b64encode(data.encode("utf-8")),
+        "attributes": {"deviceId": "herp1", "subFolder": "events"},
+    }
+
+    event = {}
+
+    assert main.receiver_function(context, event) == "OK"

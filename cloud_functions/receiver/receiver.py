@@ -51,9 +51,14 @@ def receiver(event: Any, context: Any) -> str:
     mqtt_message = base64.b64decode(event["data"]).decode("utf-8")
     logging.debug(f"decoded data: {mqtt_message}")
     logging.debug(json.dumps(mqtt_message))
-    print(mqtt_message)
 
-    # return "OK"
+    try:
+        json.loads(mqtt_message)
+    except json.JSONDecodeError:
+        logging.info(
+            "Not valid JSON payload - this is likely caused by a connection event"
+        )
+        return "OK"
 
     doc = db.collection(COLLECTION).document(datetime.datetime.now().strftime("%Y%m%d"))
 
