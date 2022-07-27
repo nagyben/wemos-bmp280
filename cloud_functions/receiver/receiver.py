@@ -47,7 +47,9 @@ def receiver(event: Any, context: Any) -> str:
     db = _get_firestore_client()
     logging.debug(context)
     logging.debug(event)
+    logging.debug(f"base64 encoded data: {event['data']}")
     mqtt_message = base64.b64decode(event["data"]).decode("utf-8")
+    logging.debug(f"decoded data: {mqtt_message}")
     logging.debug(json.dumps(mqtt_message))
     print(mqtt_message)
 
