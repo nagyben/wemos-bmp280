@@ -36,6 +36,14 @@
                     <i class="fa-solid fa-gauge-simple-high fa-2x" style="color: rgb(144, 91, 176)"></i>
                 </div>
             </div>
+            <div class="col" id="voltage">
+                <div class="col-12">
+                    <h1>{{ "%.1f" | format(voltage) }}<span class="fs-4 text-muted">V</span></h1>
+                </div>
+                <div class="col-12">
+                    <i class="fa-solid fa-battery-three-quarters fa-2x" style="color: rgb(37, 102, 214)"></i>
+                </div>
+            </div>
         </div>
         <div id="chart">
             {{chart_html | safe}}

@@ -84,5 +84,12 @@ def test_renders_pressure(index_page, firestore_data):
     )
 
 
+def test_renders_voltage(index_page, firestore_data):
+    expect(index_page.locator("#voltage h1")).to_have_text(
+        f'{viz.convert_voltage(firestore_data.iloc[-1].loc["Vcc"].astype(int)):.1f}V',
+        timeout=500,
+    )
+
+
 def test_title(index_page):
     assert index_page.title() == "Weather | 7 Villebon Way"

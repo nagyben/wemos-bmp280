@@ -155,3 +155,8 @@ def test_update_uploads_output_to_bucket_with_metadata(gcs_client, db, firestore
     blob = bucket.get_blob("index.html")
     assert blob.content_type == "text/html"
     # assert blob.cache_control == "no-cache"
+
+
+@pytest.mark.parametrize("adc,volts", [(946, 4.11), (823, 3.56)])
+def test_convert_voltage(adc, volts):
+    numpy.testing.assert_almost_equal(viz.convert_voltage(adc), volts)

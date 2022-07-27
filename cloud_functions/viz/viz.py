@@ -20,11 +20,15 @@ def render() -> str:
     df = preprocess(df)
     fig = _create_figure(df)
     fig_html = _render_plotly_html(fig)
-    return template.render(chart_html=fig_html, **_inject_data_into_template(df))
+    return template.render(
+        chart_html=fig_html, **_rename_df_columns_for_template_injection(df)
+    )
 
 
 def preprocess(df: pandas.DataFrame) -> pandas.DataFrame:
     df["timestamp"] = pandas.to_datetime(df["timestamp"], utc=True)
+    df["pressure_mbar"] = df["pressure_Pa"] / 100
+    df["voltage"] = df["Vcc"].apply(convert_voltage)
     df = df.loc[
         df["timestamp"]
         > datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=30)
@@ -32,8 +36,7 @@ def preprocess(df: pandas.DataFrame) -> pandas.DataFrame:
     return df
 
 
-def _inject_data_into_template(df: pandas.DataFrame) -> Dict[str, Any]:
-    df["pressure_mbar"] = df["pressure_Pa"] / 100
+def _rename_df_columns_for_template_injection(df: pandas.DataFrame) -> Dict[str, Any]:
     df = df.rename(columns={"humidity_%": "humidity"})
     return df.iloc[-1].to_dict()  # type: ignore
 
@@ -144,3 +147,22 @@ def update() -> None:
 def gcs_client() -> storage.Client:
     print("real client")
     return storage.Client()
+
+
+def convert_voltage(adc: int) -> float:
+    """Converts the 10-bit adc battery signal to a voltage"""
+    # with 129kOhm resistor
+    # measured using my yellow multimeter
+    # 946 == 4.11V
+    # 942 == 4.09V
+    # 823 == 3.56V
+    x1 = 946
+    y1 = 4.11
+    x2 = 823
+    y2 = 3.56
+    m = (y1 - y2) / (x1 - x2)
+    # y = mx + c
+    # c = y - mx
+    c = y1 - (m * x1)
+
+    return m * adc + c
