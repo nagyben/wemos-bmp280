@@ -137,24 +137,17 @@ def test_load_multiple_data(db):
     pandas.testing.assert_frame_equal(expected, df, check_like=True)
 
 
-def test_update_uploads_output_to_bucket_with_metadata(gcs_client, db, firestore_data):
-    bucket = gcs_client.create_bucket(STATIC_SITE_BUCKET)
+def test_upload_with_cache_control_metadata_set(monkeypatch):
+    m = mock.MagicMock()
+    blob = mock.MagicMock()
+    m.return_value.bucket.return_value.blob.return_value = blob
+    monkeypatch.setenv("STATIC_SITE_BUCKET", "")
 
-    data = firestore_data.to_dict(orient="records")
-    db.collection(FIREBASE_COLLECTION).document("20210101").set(
-        {
-            "date": "2020-01-01",
-            "data": data,
-        }
-    )
+    with mock.patch("viz.gcs_client", new=m):
+        viz.upload("<html>")
 
-    viz.update()
-
-    assert bucket.blob("index.html").exists()
-
-    blob = bucket.get_blob("index.html")
-    assert blob.content_type == "text/html"
-    # assert blob.cache_control == "no-cache"
+    assert blob.cache_control == "private, max-age=300"
+    blob.patch.assert_called_once()
 
 
 @pytest.mark.parametrize("adc,volts", [(946, 4.11), (823, 3.56)])

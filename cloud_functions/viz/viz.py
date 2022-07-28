@@ -137,11 +137,16 @@ def _render_plotly_html(fig: plotly.graph_objects.Figure) -> Any:
 
 def update() -> None:
     html = render()
-    client = gcs_client()
+    upload(html)
 
+
+def upload(html: str) -> None:
+    client = gcs_client()
     bucket = client.bucket(os.environ["STATIC_SITE_BUCKET"])
     blob = bucket.blob("index.html")
     blob.upload_from_string(html, content_type="text/html")
+    blob.cache_control = "private, max-age=300"
+    blob.patch()
 
 
 def gcs_client() -> storage.Client:
