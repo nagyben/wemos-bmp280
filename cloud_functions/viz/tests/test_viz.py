@@ -153,3 +153,50 @@ def test_upload_with_cache_control_metadata_set(monkeypatch):
 @pytest.mark.parametrize("adc,volts", [(946, 4.11), (823, 3.56)])
 def test_convert_voltage(adc, volts):
     numpy.testing.assert_almost_equal(viz.convert_voltage(adc), volts)
+
+
+def test_filter_out_Vcc_lt_500():
+    df_in = pandas.DataFrame(
+        [
+            {
+                "timestamp": datetime.datetime(2020, 1, 1).isoformat(),
+                "humidity_%": 62.50879,
+                "wifiConnecTime_ms": numpy.nan,
+                "pressure_Pa": 98756.16,
+                "Vcc": vcc,
+                "temp_C": 16.16,
+                "git_rev": "v0.1-12-g4b3b3b2",
+                "start_ms": 42.0,
+                "preConnectTime_ms": 48.0,
+                "postGcpToken_ms": 13631.0,
+                "postConnectTime_ms": 6397.0,
+            }
+            for vcc in [499, 500, 501]
+        ]
+    )
+
+    expected = pandas.DataFrame(
+        [
+            {
+                "timestamp": datetime.datetime(2020, 1, 1).isoformat(),
+                "humidity_%": 62.50879,
+                "wifiConnecTime_ms": numpy.nan,
+                "pressure_Pa": 98756.16,
+                "Vcc": vcc,
+                "temp_C": 16.16,
+                "git_rev": "v0.1-12-g4b3b3b2",
+                "start_ms": 42.0,
+                "preConnectTime_ms": 48.0,
+                "postGcpToken_ms": 13631.0,
+                "postConnectTime_ms": 6397.0,
+            }
+            for vcc in [500, 501]  # filter out everything below Vcc=500
+        ]
+    )
+
+    actual = viz._filter_out_Vcc_lt_500(df_in)
+
+    print(expected)
+    print("====")
+    print(actual)
+    pandas.testing.assert_frame_equal(actual, expected)

@@ -29,11 +29,20 @@ def preprocess(df: pandas.DataFrame) -> pandas.DataFrame:
     df["timestamp"] = pandas.to_datetime(df["timestamp"], utc=True)
     df["pressure_mbar"] = df["pressure_Pa"] / 100
     df["voltage"] = df["Vcc"].apply(convert_voltage)
-    df = df.loc[
+    df = _filter_out_Vcc_lt_500(df)
+    df = _last_n_days(df, 30)
+    return df
+
+
+def _filter_out_Vcc_lt_500(df: pandas.DataFrame) -> pandas.DataFrame:
+    return df.loc[df["Vcc"] >= 500].reset_index(drop=True)
+
+
+def _last_n_days(df: pandas.DataFrame, days: int) -> pandas.DataFrame:
+    return df.loc[
         df["timestamp"]
         > datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=30)
     ]
-    return df
 
 
 def _rename_df_columns_for_template_injection(df: pandas.DataFrame) -> Dict[str, Any]:
