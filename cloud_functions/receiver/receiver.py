@@ -10,7 +10,7 @@ from google.cloud import logging as cloudlogging
 
 def _setup_logging() -> None:
     lg_client = cloudlogging.Client()  # type: ignore
-    lg_client.setup_logging(log_level=logging.DEBUG)  # type: ignore
+    lg_client.setup_logging(log_level=logging.INFO)  # type: ignore
 
 
 from firebase_admin import firestore
@@ -58,6 +58,7 @@ def receiver(event: Any, context: Any) -> str:
         logging.info(
             "Not valid JSON payload - this is likely caused by a connection event"
         )
+        logging.info(f"Payload was: {mqtt_message}")
         return "OK"
 
     doc = db.collection(COLLECTION).document(datetime.datetime.now().strftime("%Y%m%d"))
