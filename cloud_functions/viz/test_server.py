@@ -1,4 +1,5 @@
 import datetime
+import math
 import unittest.mock as mock
 
 import flask
@@ -9,7 +10,7 @@ import viz
 
 app = flask.Flask(__name__)
 
-DAYS = 60
+DAYS = 10
 MOCK_DATA = pandas.DataFrame(
     [
         {
@@ -17,20 +18,20 @@ MOCK_DATA = pandas.DataFrame(
             "timestamp": (
                 datetime.datetime.today()
                 - datetime.timedelta(days=DAYS)
-                + datetime.timedelta(days=i)
+                + datetime.timedelta(minutes=i)
             ).isoformat(),
-            "humidity_%": 62.50879,
+            "humidity_%": 62.50879 * math.sin(i / 180 * math.pi),
             "wifiConnecTime_ms": numpy.nan,
-            "pressure_Pa": 98756.16,
-            "Vcc": 981.0,
-            "temp_C": 16.16,
+            "pressure_Pa": 98756.16 * math.sin(i / 180 * math.pi),
+            "Vcc": 981.0 * math.sin(i / 180 * math.pi),
+            "temp_C": 16.16 * math.sin(i / 180 * math.pi),
             "git_rev": "v0.1-12-g4b3b3b2",
             "start_ms": 42.0,
             "preConnectTime_ms": 48.0,
             "postGcpToken_ms": 13631.0,
             "postConnectTime_ms": 6397.0,
         }
-        for i in range(DAYS)
+        for i in range(DAYS * 24 * 60)
     ]
 )
 

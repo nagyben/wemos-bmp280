@@ -30,12 +30,17 @@ def preprocess(df: pandas.DataFrame) -> pandas.DataFrame:
     df["pressure_mbar"] = df["pressure_Pa"] / 100
     df["voltage"] = df["Vcc"].apply(convert_voltage)
     df = _filter_out_Vcc_lt_500(df)
+    df = _filter_out_lt_90k_pressure(df)
     df = _last_n_days(df, 30)
     return df
 
 
 def _filter_out_Vcc_lt_500(df: pandas.DataFrame) -> pandas.DataFrame:
     return df.loc[df["Vcc"] >= 500].reset_index(drop=True)
+
+
+def _filter_out_lt_90k_pressure(df: pandas.DataFrame) -> pandas.DataFrame:
+    return df.loc[df["pressure_Pa"] >= 90_000].reset_index(drop=True)
 
 
 def _last_n_days(df: pandas.DataFrame, days: int) -> pandas.DataFrame:
@@ -76,6 +81,8 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             y=df["temp_C"],
             name="temp_C",
             hovertemplate="<b>%{x}</b><br>%{y:.1f}",
+            mode="markers",
+            marker=dict(size=1),
         ),
         plotly.graph_objects.Scatter(
             x=df["timestamp"],
@@ -83,6 +90,8 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             name="pressure_mbar",
             yaxis="y2",
             hovertemplate="<b>%{x}</b><br>%{y:.0f}",
+            mode="markers",
+            marker=dict(size=1),
         ),
         plotly.graph_objects.Scatter(
             x=df["timestamp"],
@@ -90,6 +99,8 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             name="humidity_%",
             yaxis="y3",
             hovertemplate="<b>%{x}</b><br>%{y:.1f}",
+            mode="markers",
+            marker=dict(size=1),
         ),
         plotly.graph_objects.Scatter(
             x=df["timestamp"],
@@ -97,6 +108,8 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             name="Vcc",
             yaxis="y4",
             hovertemplate="<b>%{x}</b><br>%{y:.0f}",
+            mode="markers",
+            marker=dict(size=1),
         ),
         plotly.graph_objects.Scatter(
             x=df["timestamp"],
@@ -104,6 +117,8 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             name="GcpTokenTime_ms",
             yaxis="y5",
             hovertemplate="<b>%{x}</b><br>%{y:.0f}",
+            mode="markers",
+            marker=dict(size=1),
         ),
         plotly.graph_objects.Scatter(
             x=df["timestamp"],
@@ -111,6 +126,8 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             name="postConnectTime_ms",
             yaxis="y6",
             hovertemplate="<b>%{x}</b><br>%{y:.0f}",
+            mode="markers",
+            marker=dict(size=1),
         ),
     ]
 
