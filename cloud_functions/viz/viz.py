@@ -76,7 +76,7 @@ def _get_firestore_client() -> firestore.Client:
 
 def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
     traces = [
-        plotly.graph_objects.Scatter(
+        plotly.graph_objects.Scattergl(
             x=df["timestamp"],
             y=df["temp_C"],
             name="temp_C",
@@ -84,7 +84,7 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             mode="markers",
             marker=dict(size=1),
         ),
-        plotly.graph_objects.Scatter(
+        plotly.graph_objects.Scattergl(
             x=df["timestamp"],
             y=df["pressure_Pa"] / 100,
             name="pressure_mbar",
@@ -93,7 +93,7 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             mode="markers",
             marker=dict(size=1),
         ),
-        plotly.graph_objects.Scatter(
+        plotly.graph_objects.Scattergl(
             x=df["timestamp"],
             y=df["humidity_%"],
             name="humidity_%",
@@ -102,7 +102,7 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             mode="markers",
             marker=dict(size=1),
         ),
-        plotly.graph_objects.Scatter(
+        plotly.graph_objects.Scattergl(
             x=df["timestamp"],
             y=df["Vcc"],
             name="Vcc",
@@ -111,7 +111,7 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             mode="markers",
             marker=dict(size=1),
         ),
-        plotly.graph_objects.Scatter(
+        plotly.graph_objects.Scattergl(
             x=df["timestamp"],
             y=df["postGcpToken_ms"] - df["postConnectTime_ms"],
             name="GcpTokenTime_ms",
@@ -120,7 +120,7 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             mode="markers",
             marker=dict(size=1),
         ),
-        plotly.graph_objects.Scatter(
+        plotly.graph_objects.Scattergl(
             x=df["timestamp"],
             y=df["postConnectTime_ms"],
             name="postConnectTime_ms",
