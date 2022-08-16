@@ -83,7 +83,7 @@ resource "google_cloudfunctions_function" "viz_function_authenticated" {
   name    = "viz_authenticated${var.env_suffix}"
   runtime = "python39"
 
-  available_memory_mb   = 512
+  available_memory_mb   = 256
   source_archive_bucket = google_storage_bucket.functions_storage_bucket.name
   source_archive_object = google_storage_bucket_object.viz_zip.name
 
