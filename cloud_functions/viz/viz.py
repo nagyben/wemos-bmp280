@@ -51,7 +51,7 @@ def _filter_out_gt_110k_pressure(df: pandas.DataFrame) -> pandas.DataFrame:
 def _last_n_days(df: pandas.DataFrame, days: int) -> pandas.DataFrame:
     return df.loc[
         df["timestamp"]
-        > datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=30)
+        > datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=days)
     ]
 
 
