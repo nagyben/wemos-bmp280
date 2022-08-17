@@ -243,7 +243,7 @@ def test_filter_out_Vcc_lt_500():
     pandas.testing.assert_frame_equal(actual, expected)
 
 
-def test_filter_out_let_90k_pressure():
+def test_filter_out_lt_90k_pressure():
     df_in = pandas.DataFrame(
         [
             {
@@ -283,6 +283,53 @@ def test_filter_out_let_90k_pressure():
     )
 
     actual = viz._filter_out_lt_90k_pressure(df_in)
+
+    print(expected)
+    print("====")
+    print(actual)
+    pandas.testing.assert_frame_equal(actual, expected)
+
+
+def test_filter_out_gt_110k_pressure():
+    df_in = pandas.DataFrame(
+        [
+            {
+                "timestamp": datetime.datetime(2020, 1, 1).isoformat(),
+                "humidity_%": 62.50879,
+                "wifiConnecTime_ms": numpy.nan,
+                "pressure_Pa": pa,
+                "Vcc": 786,
+                "temp_C": 16.16,
+                "git_rev": "v0.1-12-g4b3b3b2",
+                "start_ms": 42.0,
+                "preConnectTime_ms": 48.0,
+                "postGcpToken_ms": 13631.0,
+                "postConnectTime_ms": 6397.0,
+            }
+            for pa in [109_999, 110_000, 110_001]
+        ]
+    )
+
+    expected = pandas.DataFrame(
+        [
+            {
+                "timestamp": datetime.datetime(2020, 1, 1).isoformat(),
+                "humidity_%": 62.50879,
+                "wifiConnecTime_ms": numpy.nan,
+                "pressure_Pa": pa,
+                "Vcc": 786,
+                "temp_C": 16.16,
+                "git_rev": "v0.1-12-g4b3b3b2",
+                "start_ms": 42.0,
+                "preConnectTime_ms": 48.0,
+                "postGcpToken_ms": 13631.0,
+                "postConnectTime_ms": 6397.0,
+            }
+            for pa in [109_999, 110_000]  # filter out everything above Pressure=110k
+        ]
+    )
+
+    actual = viz._filter_out_gt_110k_pressure(df_in)
 
     print(expected)
     print("====")

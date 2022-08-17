@@ -31,6 +31,7 @@ def preprocess(df: pandas.DataFrame) -> pandas.DataFrame:
     df["voltage"] = df["Vcc"].apply(convert_voltage)
     df = _filter_out_Vcc_lt_500(df)
     df = _filter_out_lt_90k_pressure(df)
+    df = _filter_out_gt_110k_pressure(df)
     df = _last_n_days(df, 30)
     return df
 
@@ -41,6 +42,10 @@ def _filter_out_Vcc_lt_500(df: pandas.DataFrame) -> pandas.DataFrame:
 
 def _filter_out_lt_90k_pressure(df: pandas.DataFrame) -> pandas.DataFrame:
     return df.loc[df["pressure_Pa"] >= 90_000].reset_index(drop=True)
+
+
+def _filter_out_gt_110k_pressure(df: pandas.DataFrame) -> pandas.DataFrame:
+    return df.loc[df["pressure_Pa"] <= 110_000].reset_index(drop=True)
 
 
 def _last_n_days(df: pandas.DataFrame, days: int) -> pandas.DataFrame:
