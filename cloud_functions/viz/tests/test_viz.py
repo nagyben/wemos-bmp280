@@ -1,8 +1,10 @@
 import datetime
 import os
 import unittest.mock as mock
+from time import time
 
 import firebase_admin
+import freezegun
 import google.auth.credentials
 import numpy
 import pandas
@@ -94,19 +96,22 @@ def gcs_client(monkeypatch):
         bucket.delete(force=True)
 
 
-def test_load_data(firestore_data, db):
+@freezegun.freeze_time(datetime.datetime(2020, 6, 1))
+def test_load_data_loads_last_30_days_by_default(db):
     delete_documents(db)
-    data = firestore_data.to_dict(orient="records")
-    db.collection(FIREBASE_COLLECTION).document("20210101").set(
-        {
-            "date": "2020-01-01",
-            "data": data,
-        }
-    )
-    df = viz.load_data()
-    pandas.testing.assert_frame_equal(firestore_data, df, check_like=True)
+    for key in ["20200601", "20200502", "20200501"]:
+        db.collection(FIREBASE_COLLECTION).document(key).set(
+            {
+                "date": "2020-06-01",
+                "data": [{"timestamp": key}],
+            }
+        )
+    expected = pandas.DataFrame([{"timestamp": "20200502"}, {"timestamp": "20200601"}])
+    actual = viz.load_data()
+    pandas.testing.assert_frame_equal(expected, actual, check_like=True)
 
 
+@freezegun.freeze_time(time_to_freeze=datetime.datetime(2021, 1, 2))
 def test_load_multiple_data(db):
     data = {
         "timestamp": datetime.datetime.now(),
@@ -130,11 +135,47 @@ def test_load_multiple_data(db):
             "data": [data2],
         }
     )
-    df = viz.load_data()
+    actual = viz.load_data()
     print(expected)
     print("=====")
-    print(df)
-    pandas.testing.assert_frame_equal(expected, df, check_like=True)
+    print(actual)
+    pandas.testing.assert_frame_equal(expected, actual, check_like=True)
+
+
+@freezegun.freeze_time(time_to_freeze=datetime.datetime(2020, 6, 1))
+def test_load_data_loads_last_n_days(db):
+
+    # == populate DB
+    delete_documents(db)
+    daterange = pandas.date_range(
+        start=datetime.datetime.today() - datetime.timedelta(days=10),
+        end=datetime.datetime.today(),
+    )
+    for date in daterange:
+        datestring = date.strftime("%Y%m%d")
+        db.collection(FIREBASE_COLLECTION).document(datestring).set(
+            {
+                "date": date.strftime("%Y-%m-%d"),
+                "data": [{"timestamp": datestring}],
+            }
+        )
+
+    # == define expected output
+    expected_date_range = pandas.date_range(
+        start=datetime.datetime.today() - datetime.timedelta(days=5),
+        end=datetime.datetime.today(),
+    )
+    expected = pandas.DataFrame(
+        [{"timestamp": date.strftime("%Y%m%d")} for date in expected_date_range]
+    )
+
+    # == get actual output
+    actual = viz.load_data(days=5)
+
+    print(expected)
+    print("======")
+    print(actual)
+    pandas.testing.assert_frame_equal(expected, actual, check_like=True)
 
 
 def test_upload_with_cache_control_metadata_set(monkeypatch):

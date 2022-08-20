@@ -55,17 +55,22 @@ def _rename_df_columns_for_template_injection(df: pandas.DataFrame) -> Dict[str,
     return df.iloc[-1].to_dict()  # type: ignore
 
 
-def load_data() -> pandas.DataFrame:
-    collection_name = os.getenv("FIREBASE_COLLECTION")
+def load_data(days: int = 30) -> pandas.DataFrame:
+    collection_name = os.environ["FIREBASE_COLLECTION"]
     db = _get_firestore_client()
-    docs = db.collection(collection_name).stream()
 
-    df = pandas.DataFrame(next(docs).to_dict()["data"])
+    df = pandas.DataFrame()
 
-    for doc in docs:
-        df = pandas.concat([df, pandas.DataFrame(doc.to_dict()["data"])])
+    for date in pandas.date_range(
+        start=datetime.datetime.today() - datetime.timedelta(days=days),
+        end=datetime.datetime.today(),
+    ):
+        datestring = date.strftime("%Y%m%d")
+        doc = db.collection(collection_name).document(datestring).get()
 
-    # df["timestamp"] = pandas.to_datetime(df["timestamp"], utc=True)#.dt.tz_localize("utc")
+        if doc.exists and (data := doc.to_dict()):
+            df = pandas.concat([df, pandas.DataFrame(data.get("data"))])
+
     df = df.reset_index(drop=True)
     return df
 
