@@ -39,7 +39,7 @@ def firestore_data():
                 "git_rev": "v0.1-12-g4b3b3b2",
                 "start_ms": 42.0,
                 "preConnectTime_ms": 48.0,
-                "postGcpToken_ms": 13631.0,
+                "postMqttConnectTime_ms": 13631.0,
                 "postConnectTime_ms": 6397.0,
             }
             for i in range(DAYS)
@@ -209,7 +209,7 @@ def test_filter_out_Vcc_lt_500():
                 "git_rev": "v0.1-12-g4b3b3b2",
                 "start_ms": 42.0,
                 "preConnectTime_ms": 48.0,
-                "postGcpToken_ms": 13631.0,
+                "postMqttConnectTime_ms": 13631.0,
                 "postConnectTime_ms": 6397.0,
             }
             for vcc in [499, 500, 501]
@@ -228,7 +228,7 @@ def test_filter_out_Vcc_lt_500():
                 "git_rev": "v0.1-12-g4b3b3b2",
                 "start_ms": 42.0,
                 "preConnectTime_ms": 48.0,
-                "postGcpToken_ms": 13631.0,
+                "postMqttConnectTime_ms": 13631.0,
                 "postConnectTime_ms": 6397.0,
             }
             for vcc in [500, 501]  # filter out everything below Vcc=500
@@ -256,7 +256,7 @@ def test_filter_out_let_90k_pressure():
                 "git_rev": "v0.1-12-g4b3b3b2",
                 "start_ms": 42.0,
                 "preConnectTime_ms": 48.0,
-                "postGcpToken_ms": 13631.0,
+                "postMqttConnectTime_ms": 13631.0,
                 "postConnectTime_ms": 6397.0,
             }
             for pa in [89_999, 90_000, 90_001]
@@ -275,7 +275,7 @@ def test_filter_out_let_90k_pressure():
                 "git_rev": "v0.1-12-g4b3b3b2",
                 "start_ms": 42.0,
                 "preConnectTime_ms": 48.0,
-                "postGcpToken_ms": 13631.0,
+                "postMqttConnectTime_ms": 13631.0,
                 "postConnectTime_ms": 6397.0,
             }
             for pa in [90_000, 90_001]  # filter out everything below Pressure=90k

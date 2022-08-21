@@ -38,7 +38,7 @@ def firestore_data():
                 "git_rev": "v0.1-12-g4b3b3b2",
                 "start_ms": 42.0,
                 "preConnectTime_ms": 48.0,
-                "postGcpToken_ms": 13631.0,
+                "postMqttConnectTime_ms": 13631.0,
                 "postConnectTime_ms": 6397.0,
             }
             for i in range(DAYS)
