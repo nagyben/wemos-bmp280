@@ -189,6 +189,16 @@ void setup()
 
   loadConfiguration("config.json", config);
 
+  // ====================
+  // Enable BME280 sensor
+  // ====================
+  DEBUG_PRINTLN(F("Enabling BME_VCC_PIN..."));
+  pinMode(BME_VCC_PIN, OUTPUT);
+  digitalWrite(BME_VCC_PIN, HIGH);
+
+  // ===============
+  // Connect to WiFi
+  // ===============
   long preConnectTime = millis();
   initWiFi(config);
   long postConnectTime = millis();
@@ -215,10 +225,6 @@ void setup()
   // =================================================
   // BME280
   // =================================================
-  DEBUG_PRINTLN(F("Enabling BME_VCC_PIN..."));
-  pinMode(BME_VCC_PIN, OUTPUT);
-  digitalWrite(BME_VCC_PIN, HIGH);
-
   DynamicJsonDocument data(256);
   data["start_ms"] = start;
   data["preConnectTime_ms"] = preConnectTime;
