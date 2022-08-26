@@ -3,13 +3,13 @@
 #define DEBUG_PRINT(x) Serial.print(x)
 #define DEBUG_PRINTLN(x) Serial.println(x)
 #define DEBUG_PRINTF(...) Serial.printf(__VA_ARGS__)
-#define BLINK(x) blink(x)
 #else
 #define DEBUG_PRINT(x)
 #define DEBUG_PRINTLN(x)
 #define DEBUG_PRINTF(...)
-#define BLINK(x)
 #endif
+
+#define BLINK(x) blink(x)
 
 #include <CloudIoTCore.h>
 #include "esp8266_mqtt.h"
