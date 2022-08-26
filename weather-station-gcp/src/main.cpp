@@ -146,11 +146,11 @@ void initWiFi(Config &config) {
     DEBUG_PRINT('.');
     BLINK(1);
     delay(100);
-    if (millis() > TIMEOUT)
-    {
-      DEBUG_PRINTLN(F("WiFi failed to connect within power budget"));
-      deepSleep();
-    }
+    // if (millis() > TIMEOUT)
+    // {
+    //   DEBUG_PRINTLN(F("WiFi failed to connect within power budget"));
+    //   deepSleep();
+    // }
   }
 
   DEBUG_PRINT(F("Connected, IP address: "));
