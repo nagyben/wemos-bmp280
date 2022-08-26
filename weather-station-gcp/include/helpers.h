@@ -5,13 +5,13 @@
 
 #ifndef HEAP
 #define HEAP                   \
-  Serial.print("free heap: "); \
-  Serial.println(ESP.getFreeHeap())
+  DEBUG_PRINT("free heap: "); \
+  DEBUG_PRINTLN(ESP.getFreeHeap())
 #endif
 #ifndef STACK
 #define STACK                   \
-  Serial.print("free stack: "); \
-  Serial.println(ESP.getFreeContStack())
+  DEBUG_PRINT("free stack: "); \
+  DEBUG_PRINTLN(ESP.getFreeContStack())
 #endif
 
 void hexprint(const char *arr, size_t length)
@@ -20,13 +20,13 @@ void hexprint(const char *arr, size_t length)
   for (unsigned int i = 0; i < length; i++)
   {
     sprintf(buffer, "%02x", arr[i]);
-    Serial.print(buffer);
-    Serial.print(" ");
+    DEBUG_PRINT(buffer);
+    DEBUG_PRINT(" ");
   }
-  Serial.println();
+  DEBUG_PRINTLN();
 }
 
-void blink(int n){
+inline void blink(int n){
   for(int i = 0; i < n; i++) {
     digitalWrite(LED_BUILTIN, LOW);
     delay(100);

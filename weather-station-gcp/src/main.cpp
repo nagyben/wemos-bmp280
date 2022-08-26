@@ -9,7 +9,11 @@
 #define DEBUG_PRINTF(...)
 #endif
 
-#define BLINK(x) blink(x)
+#ifndef LED_BUILTIN
+#define LED_BUILTIN 13
+#endif
+
+#define BLINK digitalWrite(LED_BUILTIN, LOW); delay(100); digitalWrite(LED_BUILTIN, HIGH); delay(100);
 
 #include <CloudIoTCore.h>
 #include "esp8266_mqtt.h"
@@ -18,10 +22,6 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_BME280.h>
-
-#ifndef LED_BUILTIN
-#define LED_BUILTIN 13
-#endif
 
 #define DEEPSLEEP_TIME 5 * 60 * 1e6
 
@@ -144,7 +144,7 @@ void initWiFi(Config &config) {
   while (WiFi.status() != WL_CONNECTED)
   {
     DEBUG_PRINT('.');
-    BLINK(1);
+    BLINK;
     delay(100);
     // if (millis() > TIMEOUT)
     // {
@@ -178,9 +178,9 @@ void setup()
   WiFi.forceSleepBegin();
   delay(1);
   long start = millis();
+  pinMode(LED_BUILTIN, OUTPUT);
 
 #ifdef DEBUG
-  pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   delay(500);
 #endif
