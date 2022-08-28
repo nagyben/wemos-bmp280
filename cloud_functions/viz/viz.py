@@ -85,6 +85,7 @@ def _get_firestore_client() -> firestore.Client:
 
 
 def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
+    MARKER_SIZE = 2
     traces = [
         plotly.graph_objects.Scattergl(
             x=df["timestamp"],
@@ -92,7 +93,7 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             name="temp_C",
             hovertemplate="<b>%{x}</b><br>%{y:.1f}",
             mode="markers",
-            marker=dict(size=1),
+            marker=dict(size=MARKER_SIZE),
         ),
         plotly.graph_objects.Scattergl(
             x=df["timestamp"],
@@ -101,7 +102,7 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             yaxis="y2",
             hovertemplate="<b>%{x}</b><br>%{y:.0f}",
             mode="markers",
-            marker=dict(size=1),
+            marker=dict(size=MARKER_SIZE),
         ),
         plotly.graph_objects.Scattergl(
             x=df["timestamp"],
@@ -110,7 +111,7 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             yaxis="y3",
             hovertemplate="<b>%{x}</b><br>%{y:.1f}",
             mode="markers",
-            marker=dict(size=1),
+            marker=dict(size=MARKER_SIZE),
         ),
         plotly.graph_objects.Scattergl(
             x=df["timestamp"],
@@ -119,7 +120,7 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             yaxis="y4",
             hovertemplate="<b>%{x}</b><br>%{y:.0f}",
             mode="markers",
-            marker=dict(size=1),
+            marker=dict(size=MARKER_SIZE),
         ),
         plotly.graph_objects.Scattergl(
             x=df["timestamp"],
@@ -128,7 +129,7 @@ def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
             yaxis="y5",
             hovertemplate="<b>%{x}</b><br>%{y:.0f}",
             mode="markers",
-            marker=dict(size=1),
+            marker=dict(size=MARKER_SIZE),
         ),
     ]
 
