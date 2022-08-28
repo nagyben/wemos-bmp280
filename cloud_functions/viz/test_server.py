@@ -38,8 +38,7 @@ MOCK_DATA = pandas.DataFrame(
 
 @app.route("/")
 def page():
-    with mock.patch("viz.load_data", mock.MagicMock(return_value=MOCK_DATA)):
-        return viz.render()
+    return viz.render()
 
 
 @app.route("/<path:path>")
