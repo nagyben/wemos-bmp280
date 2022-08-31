@@ -60,7 +60,7 @@ def test_renders_html(mock_load_data, firestore_data):
         f.write(html)
 
     assert 'class="plotly-graph-div"' in html
-    assert firestore_data["Vcc"].astype(str).iloc[-1] in html
+    assert firestore_data["voltage"].astype(str).iloc[-1] in html
 
 
 @pytest.fixture(scope="module")
