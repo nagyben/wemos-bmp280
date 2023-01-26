@@ -23,10 +23,10 @@ jobs:
       uses: actions/checkout@v3
 
     - name: 'install tf'
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v2
 
     - name: Setup Terragrunt
-      uses: autero1/action-terragrunt@v1.1.0
+      uses: autero1/action-terragrunt@v1.3.0
       with:
         terragrunt_version: latest
 

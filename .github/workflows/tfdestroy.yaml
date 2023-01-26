@@ -10,7 +10,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: 'install tf'
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v2
 
     - name: 'tf init'
       run: terraform init
