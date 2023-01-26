@@ -10,6 +10,8 @@ from playwright.sync_api import expect, sync_playwright
 
 import viz
 
+TODAY = datetime.datetime.now()
+
 
 @pytest.fixture(scope="session")
 def monkeysession():
@@ -26,9 +28,7 @@ def firestore_data():
             {
                 "key": numpy.nan,
                 "timestamp": (
-                    datetime.datetime.today()
-                    - datetime.timedelta(days=DAYS)
-                    + datetime.timedelta(days=i)
+                    TODAY - datetime.timedelta(days=DAYS) + datetime.timedelta(days=i)
                 ).isoformat(),
                 "humidity_%": 62.50879,
                 "wifiConnecTime_ms": numpy.nan,
@@ -88,6 +88,12 @@ def test_renders_voltage(index_page, firestore_data):
     expect(index_page.locator("#voltage h1")).to_have_text(
         f'{viz.convert_voltage(firestore_data.iloc[-1].loc["Vcc"].astype(int)):.1f}V',
         timeout=500,
+    )
+
+
+def test_renders_date(index_page):
+    expect(index_page.locator("#date")).to_have_text(
+        f'updated {TODAY.strftime("%H:%M on %d %b %Y")}', timeout=500
     )
 
 

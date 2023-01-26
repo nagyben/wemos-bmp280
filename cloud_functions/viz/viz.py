@@ -21,7 +21,9 @@ def render() -> str:
     fig = _create_figure(df)
     fig_html = _render_plotly_html(fig)
     return template.render(
-        chart_html=fig_html, **_rename_df_columns_for_template_injection(df)
+        chart_html=fig_html,
+        **_rename_df_columns_for_template_injection(df),
+        date=datetime.datetime.now().strftime("%H:%M on %d %b %Y"),
     )
 
 
