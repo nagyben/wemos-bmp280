@@ -92,4 +92,4 @@ def test_renders_voltage(index_page, firestore_data):
 
 
 def test_title(index_page):
-    assert index_page.title() == "Weather | 7 Villebon Way"
+    assert index_page.title() == "Weather | Villebon Way"
