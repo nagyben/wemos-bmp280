@@ -20,7 +20,7 @@ jobs:
 
     steps:
     - name: 'Checkout'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: 'install tf'
       uses: hashicorp/setup-terraform@v1
@@ -34,7 +34,7 @@ jobs:
       run: terragrunt --version
 
     - name: 'install python'
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
