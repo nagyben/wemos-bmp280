@@ -73,7 +73,7 @@ jobs:
 
     - name: 'pytest'
       run: |
-        python -m pytest tests/
+        python -m pytest tests/ -vs
       working-directory: cloud_functions/receiver
       env:
         FIRESTORE_EMULATOR_HOST: localhost:8080
@@ -130,7 +130,7 @@ jobs:
 
     - name: 'pytest'
       run: |
-        python -m pytest tests/
+        python -m pytest tests/ -vs
       working-directory: cloud_functions/viz
       env:
         FIRESTORE_EMULATOR_HOST: localhost:8080
