@@ -45,12 +45,12 @@ def empty_db(db):
 
 
 # https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/functions/helloworld/main_test.py
-@freezegun.freeze_time("2020-01-01")
+@freezegun.freeze_time()
 def test_adds_entry_for_date(firebase, db, empty_db):
     data = {"key": "value"}
-    expected_key = "20200101"
+    expected_key = datetime.datetime.now().strftime("%Y%m%d")
     expected_doc = {
-        "date": "2020-01-01",
+        "date": datetime.datetime.now().strftime("%Y-%m-%d"),
         "data": [{"timestamp": datetime.datetime.now().isoformat(), **data}],
     }
 
@@ -72,13 +72,13 @@ def test_adds_entry_for_date(firebase, db, empty_db):
     assert actual_doc.to_dict() == expected_doc
 
 
-@freezegun.freeze_time("2020-01-01 00:15:00")
+@freezegun.freeze_time()
 def test_adds_entry_to_existing_entries_on_same_day(firebase, db, empty_db):
     data = {"key": "value"}
-    expected_key = "20200101"
+    expected_key = datetime.datetime.now().strftime("%Y%m%d")
     db.collection("weather-test").document(expected_key).set(
         {
-            "date": "2020-01-01",
+            "date": datetime.datetime.now().strftime("%Y-%m-%d"),
             "data": [
                 {"timestamp": datetime.datetime(2020, 1, 1, 0, 0).isoformat(), **data},
                 {"timestamp": datetime.datetime(2020, 1, 1, 0, 5).isoformat(), **data},
@@ -88,12 +88,12 @@ def test_adds_entry_to_existing_entries_on_same_day(firebase, db, empty_db):
     )
 
     expected_doc = {
-        "date": "2020-01-01",
+        "date": datetime.datetime.now().strftime("%Y-%m-%d"),
         "data": [
             {"timestamp": datetime.datetime(2020, 1, 1, 0, 0).isoformat(), **data},
             {"timestamp": datetime.datetime(2020, 1, 1, 0, 5).isoformat(), **data},
             {"timestamp": datetime.datetime(2020, 1, 1, 0, 10).isoformat(), **data},
-            {"timestamp": datetime.datetime(2020, 1, 1, 0, 15).isoformat(), **data},
+            {"timestamp": datetime.datetime.now().isoformat(), **data},
         ],
     }
 
