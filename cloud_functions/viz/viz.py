@@ -1,17 +1,57 @@
 import datetime
+import json
+import logging
 import os
-from typing import Any, Dict
+import sys
+from typing import Any, Dict, List
 
 import jinja2
 import pandas
 import plotly
 import plotly.io
 import plotly.subplots
+import structlog
 from google.cloud import firestore, storage
 
 env = jinja2.Environment(
     loader=jinja2.FileSystemLoader("templates"), autoescape=jinja2.select_autoescape()
 )
+
+
+def configure_logging() -> None:
+    """Configure logging for the application."""
+    shared_processors = [
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.StackInfoRenderer(),
+        structlog.dev.set_exc_info,
+        structlog.processors.TimeStamper(fmt="iso"),
+    ]
+
+    processors: list[Any]
+
+    if sys.stderr.isatty():
+        print("we are in a tty")
+        processors = shared_processors + [
+            structlog.dev.ConsoleRenderer(),
+        ]
+
+    else:
+        processors = [
+            structlog.processors.dict_tracebacks,
+            structlog.processors.JSONRenderer(),
+        ]
+
+    structlog.configure(
+        wrapper_class=structlog.make_filtering_bound_logger(logging.NOTSET),
+        context_class=dict,
+        logger_factory=structlog.PrintLoggerFactory(),
+        processors=processors,
+    )
+
+
+configure_logging()
+LOGGER = structlog.get_logger()
 
 
 def render() -> str:
@@ -65,6 +105,7 @@ def _rename_df_columns_for_template_injection(df: pandas.DataFrame) -> Dict[str,
 def load_data(days: int = 30) -> pandas.DataFrame:
     collection_name = os.environ["FIREBASE_COLLECTION"]
     db = _get_firestore_client()
+    log = LOGGER.bind(firestore_collection_name=collection_name, firestore_client=db)
 
     df = pandas.DataFrame()
 
@@ -79,14 +120,18 @@ def load_data(days: int = 30) -> pandas.DataFrame:
             df = pandas.concat([df, pandas.DataFrame(data.get("data"))])
 
     df = df.reset_index(drop=True)
+    log = log.bind(df_shape=df.shape)
+    log.debug("Loaded data from firestore")
     return df
 
 
 def _get_firestore_client() -> firestore.Client:
-    return firestore.Client()
+    client = firestore.Client()
+    return client
 
 
 def _create_figure(df: pandas.DataFrame) -> plotly.graph_objects.Figure:
+    LOGGER.info("Creating figure")
     MARKER_SIZE = 2
     traces = [
         plotly.graph_objects.Scattergl(
@@ -172,11 +217,20 @@ def update() -> None:
 
 def upload(html: str) -> None:
     client = gcs_client()
+    log = LOGGER.bind(client=client)
+
     bucket = client.bucket(os.environ["STATIC_SITE_BUCKET"])
+    log = log.bind(bucket=bucket)
+
     blob = bucket.blob("index.html")
+    log = log.bind(blob=blob)
+
     blob.upload_from_string(html, content_type="text/html")
+
     blob.cache_control = "private, max-age=300"
     blob.patch()
+
+    log.debug("Uploaded blob")
 
 
 def gcs_client() -> storage.Client:
