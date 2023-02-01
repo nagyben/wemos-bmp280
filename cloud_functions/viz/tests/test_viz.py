@@ -70,7 +70,7 @@ def firebase():
 
 @pytest.fixture
 def db(monkeypatch):
-    cred = mock.MagicMock(spec=google.auth.credentials.Credentials)
+    cred = mock.MagicMock(spec=google.auth.credentials.AnonymousCredentials())
     client = firestore.Client(
         project=os.getenv("FIRESTORE_PROJECT_ID"), credentials=cred
     )
@@ -96,44 +96,30 @@ def gcs_client(monkeypatch):
         bucket.delete(force=True)
 
 
-@freezegun.freeze_time(datetime.datetime(2020, 6, 1))
+@freezegun.freeze_time()
 def test_load_data_loads_last_30_days_by_default(db):
     delete_documents(db)
-    for key in ["20200601", "20200502", "20200501"]:
+    seed_dates = [
+        datetime.datetime.now(),
+        datetime.datetime.now() - datetime.timedelta(days=30),
+        datetime.datetime.now() - datetime.timedelta(days=31),
+    ]
+
+    expected_dates = [
+        datetime.datetime.now(),
+        datetime.datetime.now() - datetime.timedelta(days=30),
+    ]
+
+    for date in seed_dates:
+        key = date.strftime("%Y%m%d")
         db.collection(FIREBASE_COLLECTION).document(key).set(
             {
-                "date": "2020-06-01",
+                "date": datetime.datetime.now().strftime("%Y-%m-%d"),
                 "data": [{"timestamp": key}],
             }
         )
-    expected = pandas.DataFrame([{"timestamp": "20200502"}, {"timestamp": "20200601"}])
-    actual = viz.load_data()
-    pandas.testing.assert_frame_equal(expected, actual, check_like=True)
-
-
-@freezegun.freeze_time(time_to_freeze=datetime.datetime(2021, 1, 2))
-def test_load_multiple_data(db):
-    data = {
-        "timestamp": datetime.datetime.now(),
-        "key": numpy.nan,
-    }
-    data2 = {
-        "timestamp": datetime.datetime.now(),
-        "key": numpy.nan,
-    }
-    expected = pandas.DataFrame([data, data2])
-    expected["timestamp"] = expected["timestamp"].dt.tz_localize("utc")
-    db.collection(FIREBASE_COLLECTION).document("20210101").set(
-        {
-            "date": "2020-01-01",
-            "data": [data],
-        }
-    )
-    db.collection(FIREBASE_COLLECTION).document("20210102").set(
-        {
-            "date": "2020-01-02",
-            "data": [data2],
-        }
+    expected = pandas.DataFrame(
+        reversed([{"timestamp": date.strftime("%Y%m%d")} for date in expected_dates])
     )
     actual = viz.load_data()
     print(expected)
@@ -142,7 +128,7 @@ def test_load_multiple_data(db):
     pandas.testing.assert_frame_equal(expected, actual, check_like=True)
 
 
-@freezegun.freeze_time(time_to_freeze=datetime.datetime(2020, 6, 1))
+@freezegun.freeze_time(datetime.datetime.now())
 def test_load_data_loads_last_n_days(db):
 
     # == populate DB
